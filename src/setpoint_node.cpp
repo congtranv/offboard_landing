@@ -1,4 +1,5 @@
-#include "offboard_landing/offboard.h"
+// #include "offboard_landing/offboard.h"
+#include "offboard_landing/conversion.h"
 
 int main(int argc, char **argv)
 {
@@ -13,7 +14,11 @@ int main(int argc, char **argv)
             ("mavros/local_position/pose", 10, pose_cb);
     ros::Subscriber batt_sub = nh.subscribe<sensor_msgs::BatteryState> 
             ("mavros/battery", 10, battery_cb);
-    
+    ros::Subscriber global_pos_sub = nh.subscribe<sensor_msgs::NavSatFix> 
+            ("mavros/global_position/global", 10, globalPosition_cb);
+    // ros::Subscriber gps_pos_sub = nh.subscribe<mavros_msgs::GPSRAW> 
+    //         ("mavros/gpsstatus/gps1/raw", 10, gpsPosition_cb);
+
     // publisher
     ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>
             ("mavros/setpoint_position/local", 10);
@@ -29,6 +34,16 @@ int main(int argc, char **argv)
         rate.sleep();
     }
     ROS_INFO("FCU connected");
+
+    // wait for GPS information
+    while (ros::ok() && !global_position_received)// && !gps_position_received) 
+    {
+        ROS_INFO_ONCE("Waiting for GPS signal...");
+        ros::spinOnce();
+        rate.sleep();
+    }
+    ROS_INFO("GPS position received");
+    ros::Duration(2).sleep();
 
 	// check current pose
 	for(int i = 100; ros::ok() && i > 0; --i)
@@ -48,6 +63,16 @@ int main(int argc, char **argv)
 		std::cout << "Roll : " << degree(r) << std::endl;
 		std::cout << "Pitch: " << degree(p) << std::endl;
 		std::cout << "Yaw  : " << degree(y) << std::endl;		
+        
+        //double global_position_altitude = double(gps_position.alt)/1000;
+        // std::printf("Current GPS position: [%f, %f, %.3f]\n", 
+        //              global_position.latitude, 
+        //              global_position.longitude, 
+        //              global_position.altitude);
+
+        refpoint.latitude = global_position.latitude;
+        refpoint.longitude = global_position.longitude;
+        refpoint.altitude = global_position.altitude;
 
         batt_percent = current_batt.percentage * 100;
         std::printf("Current Battery: %.1f \n", batt_percent);
@@ -153,6 +178,44 @@ int main(int argc, char **argv)
 		std::cout << check << std::endl;
 		if(check)
 		{
+            /*** test gps conversion ***/
+            // geometry_msgs::Point ecef = WGS84ToECEF(global_position.latitude,
+            //                                         global_position.longitude,
+            //                                         global_position.altitude);
+            // geographic_msgs::GeoPoint wgs84 = ECEFToWGS84(ecef.x, 
+            //                                               ecef.y,
+            //                                               ecef.z);
+            geometry_msgs::Point enu = WGS84ToENU(global_position.latitude, 
+                                                global_position.longitude, 
+                                                global_position.altitude,
+                                                refpoint.latitude,
+                                                refpoint.longitude,
+                                                refpoint.altitude);
+            geographic_msgs::GeoPoint wgs84 = ENUToWGS84(current_pose.pose.position.x, 
+                                                        current_pose.pose.position.y, 
+                                                        current_pose.pose.position.z,
+                                                        refpoint.latitude,
+                                                        refpoint.longitude,
+                                                        refpoint.altitude);
+            /********************************/
+
+            files(i, current_pose.pose.position.x, global_position.latitude);
+            files(i, current_pose.pose.position.y, global_position.longitude);
+            files(i, current_pose.pose.position.z, global_position.altitude);
+            
+            /*** test gps conversion ***/
+            // files(i, current_pose.pose.position.x, ecef.x);
+            // files(i, current_pose.pose.position.y, ecef.y);
+            // files(i, current_pose.pose.position.z, ecef.z);
+
+            // files(i, ecef.x, wgs84.latitude);
+            // files(i, ecef.y, wgs84.longitude);
+            // files(i, ecef.z, wgs84.altitude);
+
+            files(i, enu.x, wgs84.latitude);
+            files(i, enu.y, wgs84.longitude);
+            files(i, enu.z, wgs84.altitude);
+            /**********************************/
             ros::Duration(5).sleep();
 			i = i + 1;
 			ros::spinOnce();

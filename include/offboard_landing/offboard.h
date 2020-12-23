@@ -1,19 +1,22 @@
+/***** ros *****/
 #include <ros/ros.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <geographic_msgs/GeoPoseStamped.h>
 #include <mavros_msgs/State.h>
-#include <tf/tf.h>
-#include <tf/transform_datatypes.h>
-
+#include <sensor_msgs/BatteryState.h>
 #include <mavros_msgs/CommandBool.h>
 #include <mavros_msgs/SetMode.h>
+/***** local position *****/
+#include <geometry_msgs/PoseStamped.h>
+#include <geographic_msgs/GeoPoseStamped.h>
+/***** global position *****/
 #include <mavros_msgs/GlobalPositionTarget.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <mavros_msgs/GPSRAW.h>
-
-#include <sensor_msgs/BatteryState.h>
-
+/***** tools *****/
+#include <tf/tf.h>
+#include <tf/transform_datatypes.h>
+/***** c++ *****/
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <cstdio>
 
@@ -34,6 +37,7 @@ double radian(double);
 
 double measureGPS(double, double, double, double);
 
+void files(int, double, double);
 /****** DECLARE VARIANTS ******/
 mavros_msgs::State current_state;
 geometry_msgs::PoseStamped current_pose;
@@ -272,4 +276,19 @@ double measureGPS(double lat1, double lon1, double alt1, double lat2, double lon
 		}
 	}
 	return Distance;
+}
+
+/****************************************************************************************/
+/***** files: write local position and global position at the setpoint into a file ******/
+/****************************************************************************************/
+void files(int i, double local, double global)
+{
+	std::fstream file;
+	file.open("data.yaml", std::ios::app);
+	if (file.is_open())
+	{
+		file << i << ": " << local << " - " << global << std::endl;
+		file.close();
+	}
+	else std::cout << "Unable to open file \n";
 }
