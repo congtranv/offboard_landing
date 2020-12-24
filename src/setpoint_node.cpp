@@ -14,8 +14,8 @@ int main(int argc, char **argv)
             ("mavros/local_position/pose", 10, pose_cb);
     ros::Subscriber batt_sub = nh.subscribe<sensor_msgs::BatteryState> 
             ("mavros/battery", 10, battery_cb);
-    ros::Subscriber global_pos_sub = nh.subscribe<sensor_msgs::NavSatFix> 
-            ("mavros/global_position/global", 10, globalPosition_cb);
+    // ros::Subscriber global_pos_sub = nh.subscribe<sensor_msgs::NavSatFix> 
+    //         ("mavros/global_position/global", 10, globalPosition_cb);
     // ros::Subscriber gps_pos_sub = nh.subscribe<mavros_msgs::GPSRAW> 
     //         ("mavros/gpsstatus/gps1/raw", 10, gpsPosition_cb);
 
@@ -70,9 +70,9 @@ int main(int argc, char **argv)
         //              global_position.longitude, 
         //              global_position.altitude);
 
-        refpoint.latitude = global_position.latitude;
-        refpoint.longitude = global_position.longitude;
-        refpoint.altitude = global_position.altitude;
+        // refpoint.latitude = global_position.latitude;
+        // refpoint.longitude = global_position.longitude;
+        // refpoint.altitude = global_position.altitude;
 
         batt_percent = current_batt.percentage * 100;
         std::printf("Current Battery: %.1f \n", batt_percent);
@@ -185,23 +185,23 @@ int main(int argc, char **argv)
             // geographic_msgs::GeoPoint wgs84 = ECEFToWGS84(ecef.x, 
             //                                               ecef.y,
             //                                               ecef.z);
-            geometry_msgs::Point enu = WGS84ToENU(global_position.latitude, 
-                                                global_position.longitude, 
-                                                global_position.altitude,
-                                                refpoint.latitude,
-                                                refpoint.longitude,
-                                                refpoint.altitude);
-            geographic_msgs::GeoPoint wgs84 = ENUToWGS84(current_pose.pose.position.x, 
-                                                        current_pose.pose.position.y, 
-                                                        current_pose.pose.position.z,
-                                                        refpoint.latitude,
-                                                        refpoint.longitude,
-                                                        refpoint.altitude);
+            // geometry_msgs::Point enu = WGS84ToENU(global_position.latitude, 
+            //                                     global_position.longitude, 
+            //                                     global_position.altitude,
+            //                                     refpoint.latitude,
+            //                                     refpoint.longitude,
+            //                                     refpoint.altitude);
+            // geographic_msgs::GeoPoint wgs84 = ENUToWGS84(current_pose.pose.position.x, 
+            //                                             current_pose.pose.position.y, 
+            //                                             current_pose.pose.position.z,
+            //                                             refpoint.latitude,
+            //                                             refpoint.longitude,
+            //                                             refpoint.altitude);
             /********************************/
 
-            files(i, current_pose.pose.position.x, global_position.latitude);
-            files(i, current_pose.pose.position.y, global_position.longitude);
-            files(i, current_pose.pose.position.z, global_position.altitude);
+            // files(i, current_pose.pose.position.x, global_position.latitude);
+            // files(i, current_pose.pose.position.y, global_position.longitude);
+            // files(i, current_pose.pose.position.z, global_position.altitude);
             
             /*** test gps conversion ***/
             // files(i, current_pose.pose.position.x, ecef.x);
@@ -212,9 +212,9 @@ int main(int argc, char **argv)
             // files(i, ecef.y, wgs84.longitude);
             // files(i, ecef.z, wgs84.altitude);
 
-            files(i, enu.x, wgs84.latitude);
-            files(i, enu.y, wgs84.longitude);
-            files(i, enu.z, wgs84.altitude);
+            // files(i, enu.x, wgs84.latitude);
+            // files(i, enu.y, wgs84.longitude);
+            // files(i, enu.z, wgs84.altitude);
             /**********************************/
             ros::Duration(5).sleep();
 			i = i + 1;

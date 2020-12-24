@@ -27,7 +27,9 @@ const double eR  =6378.137; //km
 /****** DEFINE FUNCTIONS ******/
 bool check_position(void);
 bool check_orientation(void);
-bool check_global(void);
+// bool check_global(double, double, double);
+bool check_global(double, double, double,
+				  double, double, double);
 
 void input_local_target(void);
 void input_global_target(void);
@@ -37,7 +39,8 @@ double radian(double);
 
 double measureGPS(double, double, double, double);
 
-void files(int, double, double);
+void files(std::string, int, double, double);
+
 /****** DECLARE VARIANTS ******/
 mavros_msgs::State current_state;
 geometry_msgs::PoseStamped current_pose;
@@ -163,18 +166,37 @@ bool check_orientation()
 /****************************************************************************************************/
 /***** check_global: check when drone reached the GPS goal positions. return the true or false ******/
 /****************************************************************************************************/
-bool check_global()
+// bool check_global(double lat, double lon, double alt)
+// {
+// 	bool reached;
+// 	if(
+// 		((lat - 0.000001) < global_position.latitude)
+// 	 && (global_position.latitude < (lat + 0.000001)) 
+// 	 && ((lon - 0.000001) < global_position.longitude)
+// 	 && (global_position.longitude < (lon + 0.000001))
+// 	 && ((alt - 0.1) < global_position.altitude)
+// 	 && (global_position.altitude < (alt + 0.1))
+// 	)
+// 	{
+// 		reached = 1;
+// 	}
+// 	else
+// 	{
+// 		reached = 0;
+// 	}
+// 	return reached;
+// }
+
+bool check_global(double goal_x, double goal_y, double goal_z,
+				  double curr_x, double curr_y, double curr_z)
 {
 	bool reached;
-	double global_position_alt = double(gps_position.alt)/1000;
-	if(
-		((goal_position.pose.position.latitude - 0.000001) < global_position.latitude)
-	 && (global_position.latitude < (goal_position.pose.position.latitude + 0.000001)) 
-	 && ((goal_position.pose.position.longitude - 0.000001) < global_position.longitude)
-	 && (global_position.longitude < (goal_position.pose.position.longitude + 0.000001))
-	 && ((goal_position.pose.position.altitude - 0.1) < global_position_alt)
-	 && (global_position_alt < (goal_position.pose.position.altitude + 0.1))
-	)
+	if(((goal_x - 0.1) < curr_x)
+	&& (curr_x < (goal_x + 0.1)) 
+	&& ((goal_y - 0.1) < curr_y)
+	&& (curr_y < (goal_y + 0.1))
+	&& ((goal_z - 0.1) < curr_z)
+	&& (curr_z < (goal_z + 0.1)))
 	{
 		reached = 1;
 	}
@@ -184,7 +206,6 @@ bool check_global()
 	}
 	return reached;
 }
-
 /**************************************************************************/
 /***** input_local_target: input the number of waypoints and each point   *
  * coodinates (x, y, z). and input the yaw rotation at each waypoint ******/
@@ -220,14 +241,33 @@ void input_local_target()
 
 void input_global_target()
 {
-	std::cout << "Input GPS position(s)" << std::endl;
-	std::cout << "Number of goal(s): "; std::cin >> goal_num;
-	for (int i = 0; i < goal_num; i++)
+	char c; 
+	while (1)
 	{
-		std::cout << "Goal ("<< i+1 <<") position:" << std::endl;
-		std::cout << "Latitude  " << i+1 << " (in degree):"; std::cin >> goal_pos[i][0];
-		std::cout << "Longitude " << i+1 << " (in degree):"; std::cin >> goal_pos[i][1];
-		std::cout << "Altitude  " << i+1 << "  (in meter):"; std::cin >> goal_pos[i][2];
+		std::cout << "Input GPS position(s)" << std::endl;
+		std::cout << "Number of goal(s): "; std::cin >> goal_num;
+		if (goal_num <= 0) input_global_target();
+		else
+		{
+			for (int i = 0; i < goal_num; i++)
+			{
+				std::cout << "Goal ("<< i+1 <<") position:" << std::endl;
+				std::cout << "Latitude  " << i+1 << " (in degree): "; std::cin >> goal_pos[i][0];
+				std::cout << "Longitude " << i+1 << " (in degree): "; std::cin >> goal_pos[i][1];
+				std::cout << "Altitude  " << i+1 << "  (in meter): "; std::cin >> goal_pos[i][2];
+			}
+		}
+		std::cout << "Do you want to INPUT AGAIN? (y/n)" << std::endl;
+		std::cin >> c;
+		if (c == y)
+		{
+			input_global_target();
+		}
+		else
+		{
+			break;
+		}
+		break;
 	}
 }
 
@@ -281,10 +321,11 @@ double measureGPS(double lat1, double lon1, double alt1, double lat2, double lon
 /****************************************************************************************/
 /***** files: write local position and global position at the setpoint into a file ******/
 /****************************************************************************************/
-void files(int i, double local, double global)
+void files(std::string name, int i, double local, double global)
 {
 	std::fstream file;
-	file.open("data.yaml", std::ios::app);
+	name = name + ".yaml";
+	file.open(name, std::ios::app);
 	if (file.is_open())
 	{
 		file << i << ": " << local << " - " << global << std::endl;

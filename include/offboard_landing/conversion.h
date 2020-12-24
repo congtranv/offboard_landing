@@ -2,6 +2,7 @@
 #include <geometry_msgs/Point.h>
 #include <geographic_msgs/GeoPoint.h>
 
+/***********************  CONSTANTS  ***********************/
 const double a = 6378137.0;         // WGS-84 Earth semimajor axis (m)
 const double b = 6356752.314245;     // Derived Earth semiminor axis (m)
 const double f = (a - b) / a;           // Ellipsoid Flatness
@@ -15,18 +16,39 @@ const double a_sq = a * a;
 const double b_sq = b * b;
 const double e_sq = f * (2 - f);    // Square of Eccentricity
 
+/***********************               FUNCTIONS              ***********************/
+/* WGS84ToECEF: Converts the WGS-84 Geodetic point (latitude, longitude, altitude) **
+** to Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z)                      **/
 geometry_msgs::Point WGS84ToECEF(double, double, double);
-geographic_msgs::GeoPoint ECEFToWGS84(double, double, double);
-geometry_msgs::Point ECEFToENU(double, double, double,
-                                double, double, double);
-geometry_msgs::Point ENUToECEF(double, double, double,
-                                double, double, double);
-geometry_msgs::Point WGS84ToENU(double, double, double,
-                                double, double, double);
-geographic_msgs::GeoPoint ENUToWGS84(double, double, double,
-                                      double, double, double);
 
-geographic_msgs::GeoPoint refpoint;
+/* ECEFToWGS84: Converts the Earth-Centered Earth-Fixed coordinates (x, y, z) to   **
+** WGS-84 Geodetic point (latitude, longitude, altitude)                           **/
+geographic_msgs::GeoPoint ECEFToWGS84(double, double, double);
+
+/* ECEFToENU: Converts the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z) **
+** to East-North-Up coordinates in a Local Tangent Plane that is centered at the   **
+** (WGS-84) Geodetic point (lat0, lon0, alt0)                                      **/
+geometry_msgs::Point ECEFToENU(double, double, double, double, double, double);
+
+/* ENUToECEF: Converts East-North-Up coordinates (xEast, yNorth, zUp) in a Local   **
+** Tangent Plane that is centered at  (WGS-84) Geodetic point (lat0, lon0, alt0)   **
+** to the Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z)                  **/
+geometry_msgs::Point ENUToECEF(double, double, double, double, double, double);
+
+/* WGS84ToENU: Converts the geodetic WGS-84 coordinated (lat, lon, alt) to         **
+** East-North-Up coordinates in a Local Tangent Plane that is centered at the      **
+** (WGS-84) Geodetic point (lat0, lon0, alt0)                                      **/
+geometry_msgs::Point WGS84ToENU(double, double, double, double, double, double);
+
+/* ENUToWGS84: Converts the East-North-Up coordinates in a Local Tangent Plane to  **
+** geodetic WGS-84 coordinated (lat, lon, alt) that is centered at the (WGS-84)    **
+** Geodetic point (lat0, lon0, alt0)                                               **/
+geographic_msgs::GeoPoint ENUToWGS84(double, double, double, double, double, double);
+
+// VARIANTS 
+geometry_msgs::PoseStamped goal_pose; //Local goal position setpoint
+geometry_msgs::Point enu_goal, enu_curr; //Local ENU points: converted from GPS goal and current
+geographic_msgs::GeoPoint refpoint; //Reference point to convert ECEF to ENU and vice versa
 
 geometry_msgs::Point WGS84ToECEF(double lat, double lon, double alt)
 {
