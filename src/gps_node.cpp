@@ -130,8 +130,8 @@ int main(int argc, char **argv)
                               global_position.longitude,
                               global_position.altitude,
                 refpoint.latitude, refpoint.longitude, refpoint.altitude);
-        bool check = check_global(enu_goal.x, enu_goal.y, enu_goal.z,
-                                  enu_curr.x, enu_curr.y, enu_curr.z);
+        bool check = check_position(enu_goal.x, enu_goal.y, enu_goal.z,
+                                    enu_curr.x, enu_curr.y, enu_curr.z);
         std::cout << check << std::endl;
 		if(check)
 		{
