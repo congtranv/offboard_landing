@@ -1,4 +1,4 @@
-#include "offboard_landing/offboard.h"
+#include "offboard_landing/offboard_landing.h"
 
 int main(int argc, char **argv)
 {
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     // wait for FCU connection
     while(ros::ok() && !current_state.connected)
     {
-        ROS_INFO_ONCE("Connecting to FCU...");
+        ROS_INFO_ONCE("Connecting to FCU ...");
         ros::spinOnce();
         rate.sleep();
     }

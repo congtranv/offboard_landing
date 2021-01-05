@@ -1,10 +1,9 @@
-// #include "offboard_landing/offboard.h"
-#include "offboard_landing/conversion.h"
+#include "offboard_landing/offboard_landing.h"
 
 int main(int argc, char **argv)
 {
     // initialize ros node
-    ros::init(argc, argv, "setpoint");
+    ros::init(argc, argv, "offboard");
     ros::NodeHandle nh;
 
     // subscriber
@@ -14,7 +13,7 @@ int main(int argc, char **argv)
             ("mavros/local_position/pose", 10, pose_cb);
     ros::Subscriber batt_sub = nh.subscribe<sensor_msgs::BatteryState> 
             ("mavros/battery", 10, battery_cb);
-
+    
     // publisher
     ros::Publisher local_pos_pub = nh.advertise<geometry_msgs::PoseStamped>
             ("mavros/setpoint_position/local", 10);
@@ -30,8 +29,6 @@ int main(int argc, char **argv)
         rate.sleep();
     }
     ROS_INFO("FCU connected");
-    ROS_INFO("Checking status...");
-    ros::Duration(1).sleep();
 
 	// check current pose
 	for(int i = 100; ros::ok() && i > 0; --i)
@@ -51,15 +48,13 @@ int main(int argc, char **argv)
 		std::cout << "Roll : " << degree(r) << std::endl;
 		std::cout << "Pitch: " << degree(p) << std::endl;
 		std::cout << "Yaw  : " << degree(y) << std::endl;		
-        
+
         batt_percent = current_batt.percentage * 100;
         std::printf("Current Battery: %.1f \n", batt_percent);
 
 		ros::spinOnce();
         rate.sleep();
     }
-    ROS_INFO("Check status done");
-    ros::Duration(1).sleep();
 
     // set target pose
 	input_local_target();
@@ -71,9 +66,7 @@ int main(int argc, char **argv)
     yaw   = radian(target_pos[0][5]);
     q.setRPY(roll, pitch, yaw);
 	tf::quaternionTFToMsg(q, target_pose.pose.orientation);
-    
-    ROS_INFO("Setting OFFBOARD stream...");
-    ros::Duration(1).sleep();
+
     // send a few setpoints before starting
     for(int i = 100; ros::ok() && i > 0; --i)
     {
@@ -82,8 +75,8 @@ int main(int argc, char **argv)
         ros::spinOnce();
         rate.sleep();
     }
-    ROS_INFO("Set OFFBOARD stream done. Ready");
-    ros::Duration(1).sleep();
+    ROS_INFO("Ready");
+    ros::Duration(3).sleep();
 
     int i=0;
     while(ros::ok())

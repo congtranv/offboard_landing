@@ -1,8 +1,8 @@
-#include "offboard_landing/offboard.h"
+#include "offboard_landing/offboard_landing.h"
 
 int main(int argc, char **argv) 
 {
-    ros::init(argc, argv, "setmode");
+    ros::init(argc, argv, "setmode_offb");
     ros::NodeHandle nh;
 
     ros::ServiceClient arming_client = nh.serviceClient<mavros_msgs::CommandBool> 
