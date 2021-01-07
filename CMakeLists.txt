@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  roslaunch
+#  roslaunch
 )
 
 catkin_package(
@@ -36,22 +36,30 @@ include_directories(
 
 # roslaunch_add_file_check(launch)
 
-add_executable(hovering src/hovering_node.cpp)
-target_link_libraries(hovering
+add_library(
+  offboard_lib
+  src/offboard_lib.cpp
+)
+add_library(
+  logging_lib
+  src/logging_lib.cpp
+)
+
+target_link_libraries(offboard_lib
+  ${catkin_LIBRARIES}
+)
+target_link_libraries(logging_lib
   ${catkin_LIBRARIES}
 )
 
 add_executable(offboard src/offboard_node.cpp)
-target_link_libraries(offboard
-  ${catkin_LIBRARIES}
-)
-
-add_executable(gps_offb src/gps_offb.cpp)
-target_link_libraries(gps_offb
-  ${catkin_LIBRARIES}
-)
-
 add_executable(setmode_offb src/setmode_offb.cpp)
+
+target_link_libraries(offboard
+  offboard_lib
+  logging_lib
+)
 target_link_libraries(setmode_offb
-  ${catkin_LIBRARIES}
+  offboard_lib
+  logging_lib
 )
