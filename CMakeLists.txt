@@ -53,9 +53,14 @@ target_link_libraries(logging_lib
 )
 
 add_executable(offboard src/offboard_node.cpp)
+add_executable(logging src/logging_node.cpp)
 add_executable(setmode_offb src/setmode_offb.cpp)
 
 target_link_libraries(offboard
+  offboard_lib
+  logging_lib
+)
+target_link_libraries(logging
   offboard_lib
   logging_lib
 )

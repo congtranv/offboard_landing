@@ -277,10 +277,10 @@ int main(int argc, char **argv)
                                 current_pose.pose.position.x, 
                                 current_pose.pose.position.y, 
                                 current_pose.pose.position.z);   
-                std::printf("[ INFO] Next local position: [%.3f, %.3f, %.3f]\n", 
-                                target_pos[i+1][0], 
-                                target_pos[i+1][1],
-                                target_pos[i+1][2]);
+                // std::printf("[ INFO] Next local position: [%.3f, %.3f, %.3f]\n", 
+                //                 target_pos[i+1][0], 
+                //                 target_pos[i+1][1],
+                //                 target_pos[i+1][2]);
             
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
@@ -306,7 +306,11 @@ int main(int argc, char **argv)
                 // ros::Duration(5).sleep();
                 while ((ros::Time::now() - t_check) < ros::Duration(5))
                 {
-                    std::cout << "Hover \n";
+                    std::cout << "[ INFO] Hover at checkpoint \n";
+                    std::printf("[ INFO] Next local position: [%.3f, %.3f, %.3f]\n", 
+                                target_pos[i+1][0], 
+                                target_pos[i+1][1],
+                                target_pos[i+1][2]);
                     local_pos_pub.publish(target_pose);
 
                     ros::spinOnce();
@@ -325,7 +329,7 @@ int main(int argc, char **argv)
                                 current_pose.pose.position.y, 
                                 current_pose.pose.position.z);
     		        
-                std::printf("[ INFO] Ready to LANDING \n");
+                // std::printf("[ INFO] Ready to LANDING \n");
             
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
@@ -351,7 +355,8 @@ int main(int argc, char **argv)
                 // ros::Duration(5).sleep();
                 while ((ros::Time::now() - t_check) < ros::Duration(5))
                 {
-                    std::cout << "Hover \n";
+                    std::cout << "[ INFO] Hover at checkpoint \n";
+                    std::printf("[ INFO] Ready to LANDING \n");
                     local_pos_pub.publish(target_pose);
 
                     ros::spinOnce();
@@ -445,10 +450,10 @@ int main(int argc, char **argv)
                                 global_position.latitude, 
                                 global_position.longitude, 
                                 global_position.altitude);
-                std::printf("[ INFO] Next GPS position: [%f, %f, %.3f]\n", 
-                                goal_pos[i+1][0], 
-                                goal_pos[i+1][1],
-                                goal_pos[i+1][2]);
+                // std::printf("[ INFO] Next GPS position: [%f, %f, %.3f]\n", 
+                //                 goal_pos[i+1][0], 
+                //                 goal_pos[i+1][1],
+                //                 goal_pos[i+1][2]);
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
@@ -473,7 +478,11 @@ int main(int argc, char **argv)
                 // ros::Duration(5).sleep();
                 while ((ros::Time::now() - t_check) < ros::Duration(5))
                 {
-                    std::cout << "Hover \n";
+                    std::cout << "[ INFO] Hover at checkpoint \n";
+                    std::printf("[ INFO] Next GPS position: [%f, %f, %.3f]\n", 
+                                goal_pos[i+1][0], 
+                                goal_pos[i+1][1],
+                                goal_pos[i+1][2]);
                     local_pos_pub.publish(target_pose);
 
                     ros::spinOnce();
@@ -491,7 +500,7 @@ int main(int argc, char **argv)
                                 global_position.latitude, 
                                 global_position.longitude, 
                                 global_position.altitude);
-                std::printf("[ INFO] Ready to LANDING \n");
+                // std::printf("[ INFO] Ready to LANDING \n");
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
@@ -516,7 +525,8 @@ int main(int argc, char **argv)
                 // ros::Duration(5).sleep();
                 while ((ros::Time::now() - t_check) < ros::Duration(5))
                 {
-                    std::cout << "Hover \n";
+                    std::cout << "[ INFO] Hover at checkpoint \n";
+                    std::printf("[ INFO] Ready to LANDING \n");
                     local_pos_pub.publish(target_pose);
 
                     ros::spinOnce();

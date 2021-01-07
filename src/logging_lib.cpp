@@ -8,8 +8,8 @@ void creates()/*std::string name, double x_log, double y_log, double z_log,
 	std::fstream file; 
 	file.open("position.csv", std::ios::out | std::ios::app); 
     
-	file << ", , , , , , , , , , \n";
-    file << "Point, x (m), y (m), z (m), lat (degree), lon (degree), alt (m), gps_lat, gps_lon, gps_alt, rel alt (m) \n";
+	file << "Point, x (m), y (m), z (m), lat (degree), lon (degree), alt (m), gps_lat, gps_lon, gps_alt, rel alt (m) \n";
+    file << ", , , , , , , , , , \n";
     // file << name << ", " << std::fixed << std::setprecision(6) << x_log << ", " 
 	// 					 << std::fixed << std::setprecision(6) << y_log << ", " 
 	// 					 << std::fixed << std::setprecision(6) << z_log << ", "
@@ -104,10 +104,10 @@ void creates_sensor()/*std::string name, double av_x, double av_y, double av_z,
 
 	file.open("sensor.csv", std::ios::out | std::ios::app); 
 
-	file << ", , , , , , , , , , , \n";
-    file << "Point, angular vel x (rad/s), angular vel y (rad/s), angular vel z (rad/s), " 
+	file << "Point, angular vel x (rad/s), angular vel y (rad/s), angular vel z (rad/s), " 
          << "linear acc x (m/s^2), linear acc y (m/s^2), linear acc z (m/s^2), "
          << "mag field x (T), mag field y (T), mag field z (T), static press (Pa), diff press (Pa) \n";
+    file << ", , , , , , , , , , , \n";
     // file << name << ", " << std::fixed << std::setprecision(8) << av_x << ", " 
 	// 					 << std::fixed << std::setprecision(8) << av_y << ", " 
 	// 					 << std::fixed << std::setprecision(8) << av_z << ", "
