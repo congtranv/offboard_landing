@@ -79,6 +79,8 @@ bool input_type = true; // true == input local || false == input global setpoint
 bool final_check = false; // true == reached final point || false == NOT final point
 float batt_percent; // baterry capacity
 
+ros::Time t_check;
+
 geometry_msgs::Point enu_goal, enu_curr; //Local ENU points: converted from GPS goal and current
 geographic_msgs::GeoPoint wgs84_target, wgs84_curr; //Global WGS84 point: convert from ENU target and current
 geographic_msgs::GeoPoint refpoint; //Reference point to convert ECEF to ENU and vice versa

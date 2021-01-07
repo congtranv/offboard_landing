@@ -272,6 +272,7 @@ int main(int argc, char **argv)
             std::cout << check << std::endl;
             if(check && !final_check)
             {
+                t_check = ros::Time::now();
                 std::printf("[ INFO] Reached position: [%.3f, %.3f, %.3f]\n", 
                                 current_pose.pose.position.x, 
                                 current_pose.pose.position.y, 
@@ -302,13 +303,23 @@ int main(int argc, char **argv)
                                       mag_data.magnetic_field.z,
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
-                ros::Duration(5).sleep();
-    			i = i + 1;
-    			ros::spinOnce();
+                // ros::Duration(5).sleep();
+                while ((ros::Time::now() - t_check) < ros::Duration(5))
+                {
+                    std::cout << "Hover \n";
+                    local_pos_pub.publish(target_pose);
+
+                    ros::spinOnce();
+    		        rate.sleep();
+                }
+
+                i = i + 1;
+                ros::spinOnce();
     		    rate.sleep();
     		}
             else if (check && final_check)
             {
+                t_check = ros::Time::now();
                 std::printf("[ INFO] Reached FINAL position: [%.3f, %.3f, %.3f]\n", 
                                 current_pose.pose.position.x, 
                                 current_pose.pose.position.y, 
@@ -337,7 +348,15 @@ int main(int argc, char **argv)
                                       mag_data.magnetic_field.z,
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
-                ros::Duration(5).sleep();
+                // ros::Duration(5).sleep();
+                while ((ros::Time::now() - t_check) < ros::Duration(5))
+                {
+                    std::cout << "Hover \n";
+                    local_pos_pub.publish(target_pose);
+
+                    ros::spinOnce();
+    		        rate.sleep();
+                }
 
     			set_mode.request.custom_mode = "AUTO.LAND";
         	    if( set_mode_client.call(set_mode) && set_mode.response.mode_sent)
@@ -421,6 +440,7 @@ int main(int argc, char **argv)
             std::cout << check << std::endl;
             if (check && !final_check)
             {
+                t_check = ros::Time::now();
                 std::printf("[ INFO] Reached position: [%f, %f, %.3f]\n", 
                                 global_position.latitude, 
                                 global_position.longitude, 
@@ -450,13 +470,23 @@ int main(int argc, char **argv)
                                       mag_data.magnetic_field.z,
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
-                ros::Duration(5).sleep();
+                // ros::Duration(5).sleep();
+                while ((ros::Time::now() - t_check) < ros::Duration(5))
+                {
+                    std::cout << "Hover \n";
+                    local_pos_pub.publish(target_pose);
+
+                    ros::spinOnce();
+    		        rate.sleep();
+                }
+
                 i = i + 1;
                 ros::spinOnce();
                 rate.sleep();
             }
             else if (check && final_check)
             {
+                t_check = ros::Time::now();
                 std::printf("[ INFO] Reached FINAL position: [%f, %f, %.3f]\n", 
                                 global_position.latitude, 
                                 global_position.longitude, 
@@ -483,7 +513,15 @@ int main(int argc, char **argv)
                                       mag_data.magnetic_field.z,
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
-                ros::Duration(5).sleep();
+                // ros::Duration(5).sleep();
+                while ((ros::Time::now() - t_check) < ros::Duration(5))
+                {
+                    std::cout << "Hover \n";
+                    local_pos_pub.publish(target_pose);
+
+                    ros::spinOnce();
+    		        rate.sleep();
+                }
 
                 set_mode.request.custom_mode = "AUTO.LAND";
                 if( set_mode_client.call(set_mode) && set_mode.response.mode_sent)
