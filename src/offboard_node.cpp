@@ -304,7 +304,7 @@ int main(int argc, char **argv)
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
                 // ros::Duration(5).sleep();
-                while ((ros::Time::now() - t_check) < ros::Duration(5))
+                while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
                     std::cout << "[ INFO] Hover at checkpoint \n";
                     std::printf("[ INFO] Next local position: [%.3f, %.3f, %.3f]\n", 
@@ -353,7 +353,7 @@ int main(int argc, char **argv)
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
                 // ros::Duration(5).sleep();
-                while ((ros::Time::now() - t_check) < ros::Duration(5))
+                while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
                     std::cout << "[ INFO] Hover at checkpoint \n";
                     std::printf("[ INFO] Ready to LANDING \n");
@@ -476,7 +476,7 @@ int main(int argc, char **argv)
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
                 // ros::Duration(5).sleep();
-                while ((ros::Time::now() - t_check) < ros::Duration(5))
+                while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
                     std::cout << "[ INFO] Hover at checkpoint \n";
                     std::printf("[ INFO] Next GPS position: [%f, %f, %.3f]\n", 
@@ -523,7 +523,7 @@ int main(int argc, char **argv)
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
                 // ros::Duration(5).sleep();
-                while ((ros::Time::now() - t_check) < ros::Duration(5))
+                while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
                     std::cout << "[ INFO] Hover at checkpoint \n";
                     std::printf("[ INFO] Ready to LANDING \n");

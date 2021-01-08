@@ -142,10 +142,10 @@ int main(int argc, char **argv)
         ros::spinOnce();
         rate.sleep();
     }
-    std::cout << "[ INFO] READY - Begin logging \n";
-    ros::Duration(1).sleep();
+    std::cout << "[ INFO] READY - Waiting arm and takeoff... \n";
+    // ros::Duration(1).sleep();
     
-    while (ros::ok())
+    while (ros::ok() && current_state.armed)
     {
         std::printf("\nCurrent local position: [%.3f, %.3f, %.3f]\n", 
                      current_pose.pose.position.x, 
