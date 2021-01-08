@@ -143,7 +143,8 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
-    // ros::Duration(1).sleep();
+    std::cout << "[ INFO] Initial stabilized \n";
+    ros::Duration(1).sleep();
     
     // ros::Time last_request = ros::Time::now();
     while (ros::ok())

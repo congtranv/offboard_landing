@@ -198,8 +198,6 @@ int main(int argc, char **argv)
         rate.sleep();
     }
     std::cout << "[ INFO] Set OFFBOARD stream done \n";
-    std::cout << "[ INFO] Ready to switch ARM and OFFBOARD \n";
-    ros::Duration(1).sleep();
 
     gps_lat = double(gps_position.lat)/10000000;
     gps_lon = double(gps_position.lon)/10000000;
@@ -223,6 +221,15 @@ int main(int argc, char **argv)
                                  mag_data.magnetic_field.z,
                                  static_press.fluid_pressure, 
                                  diff_press.fluid_pressure);
+    ros::Duration(1).sleep();
+
+    while (ros::ok() && !current_state.armed)
+    {
+        std::cout << "[ INFO] Waiting arm and takeoff... \n";
+        
+        ros::spinOnce();
+        rate.sleep();
+    }
 
     int i = 0;
     if (input_type)
