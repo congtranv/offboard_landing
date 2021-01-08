@@ -142,44 +142,54 @@ int main(int argc, char **argv)
         ros::spinOnce();
         rate.sleep();
     }
-    std::cout << "[ INFO] READY - Waiting arm and takeoff... \n";
+
     // ros::Duration(1).sleep();
     
-    while (ros::ok() && current_state.armed)
+    // ros::Time last_request = ros::Time::now();
+    while (ros::ok())
     {
-        std::printf("\nCurrent local position: [%.3f, %.3f, %.3f]\n", 
-                     current_pose.pose.position.x, 
-                     current_pose.pose.position.y, 
-                     current_pose.pose.position.z);
-		
-        std::printf("Current global position: [%f, %f, %.3f]\n", 
-                     global_position.latitude, 
-                     global_position.longitude, 
-                     global_position.altitude);
+        if (!current_state.armed)
+        {
+            std::cout << "[ INFO] Waiting arm and takeoff... \n";
+        }
+        else
+        {
+            std::cout << "[ INFO] Logging... \n";
+            std::printf("\nCurrent local position: [%.3f, %.3f, %.3f]\n", 
+                        current_pose.pose.position.x, 
+                        current_pose.pose.position.y, 
+                        current_pose.pose.position.z);
+            
+            std::printf("Current global position: [%f, %f, %.3f]\n", 
+                        global_position.latitude, 
+                        global_position.longitude, 
+                        global_position.altitude);
 
-        gps_lat = double(gps_position.lat)/10000000;
-        gps_lon = double(gps_position.lon)/10000000;
-        gps_alt = double(gps_position.alt)/1000;
+            gps_lat = double(gps_position.lat)/10000000;
+            gps_lon = double(gps_position.lon)/10000000;
+            gps_alt = double(gps_position.alt)/1000;
 
-        updates("flight", current_pose.pose.position.x,
-                          current_pose.pose.position.y,
-                          current_pose.pose.position.z,
-                          global_position.latitude,
-                          global_position.longitude,
-                          global_position.altitude,
-                          gps_lat, gps_lon, gps_alt, rel_alt.data);
-        updates_sensor("flight", imu_data.angular_velocity.x, 
-                                 imu_data.angular_velocity.y,
-                                 imu_data.angular_velocity.z,
-                                 imu_data.linear_acceleration.x, 
-                                 imu_data.linear_acceleration.y, 
-                                 imu_data.linear_acceleration.z,
-                                 mag_data.magnetic_field.x, 
-                                 mag_data.magnetic_field.y, 
-                                 mag_data.magnetic_field.z,
-                                 static_press.fluid_pressure, 
-                                 diff_press.fluid_pressure);
-        ros::Duration(0.1).sleep();
+            updates("flight", current_pose.pose.position.x,
+                            current_pose.pose.position.y,
+                            current_pose.pose.position.z,
+                            global_position.latitude,
+                            global_position.longitude,
+                            global_position.altitude,
+                            gps_lat, gps_lon, gps_alt, rel_alt.data);
+            updates_sensor("flight", imu_data.angular_velocity.x, 
+                                    imu_data.angular_velocity.y,
+                                    imu_data.angular_velocity.z,
+                                    imu_data.linear_acceleration.x, 
+                                    imu_data.linear_acceleration.y, 
+                                    imu_data.linear_acceleration.z,
+                                    mag_data.magnetic_field.x, 
+                                    mag_data.magnetic_field.y, 
+                                    mag_data.magnetic_field.z,
+                                    static_press.fluid_pressure, 
+                                    diff_press.fluid_pressure);
+            ros::Duration(0.1).sleep();
+        }
+        
         ros::spinOnce();
         rate.sleep();
     }
