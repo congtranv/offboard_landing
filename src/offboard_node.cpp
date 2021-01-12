@@ -1,49 +1,6 @@
 #include "offboard_landing/offboard_landing.h"
 #include "offboard_landing/logging.h"
 
-// callback functions
-void state_cb(const mavros_msgs::State::ConstPtr& msg)
-{
-    current_state = *msg;
-}
-void relativeAlt_cb(const std_msgs::Float64::ConstPtr& msg)
-{
-    rel_alt = *msg;
-}
-void imuData_cb(const sensor_msgs::Imu::ConstPtr& msg)
-{
-	imu_data = *msg;
-}
-void magData_cb(const sensor_msgs::MagneticField::ConstPtr& msg)
-{
-	mag_data = *msg;
-}
-void staticPress_cb(const sensor_msgs::FluidPressure::ConstPtr& msg)
-{
-	static_press = *msg;
-}
-void diffPress_cb(const sensor_msgs::FluidPressure::ConstPtr& msg)
-{
-	diff_press = *msg;
-}
-void localPose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
-{
-    current_pose = *msg;
-}
-void globalPosition_cb(const sensor_msgs::NavSatFix::ConstPtr& msg) 
-{
-    global_position = *msg;
-    global_position_received = true;
-}
-void gpsPosition_cb(const mavros_msgs::GPSRAW::ConstPtr& msg) 
-{
-    gps_position = *msg;
-	gps_position_received = true;
-}
-void battery_cb(const sensor_msgs::BatteryState::ConstPtr& msg) 
-{
-    current_batt = *msg;
-}
 
 int main(int argc, char **argv)
 {
@@ -362,7 +319,6 @@ int main(int argc, char **argv)
                 // ros::Duration(5).sleep();
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
-                    std::cout << "[ INFO] Hover at checkpoint \n";
                     std::printf("[ INFO] Ready to LANDING \n");
                     local_pos_pub.publish(target_pose);
 
@@ -532,7 +488,6 @@ int main(int argc, char **argv)
                 // ros::Duration(5).sleep();
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
-                    std::cout << "[ INFO] Hover at checkpoint \n";
                     std::printf("[ INFO] Ready to LANDING \n");
                     local_pos_pub.publish(target_pose);
 

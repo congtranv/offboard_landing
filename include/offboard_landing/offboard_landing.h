@@ -176,3 +176,46 @@ geometry_msgs::Point WGS84ToENU(double, double, double, double, double, double);
 ** Geodetic point (lat0, lon0, alt0)                                               **/
 geographic_msgs::GeoPoint ENUToWGS84(double, double, double, double, double, double);
 
+// callback functions
+void state_cb(const mavros_msgs::State::ConstPtr& msg)
+{
+    current_state = *msg;
+}
+void relativeAlt_cb(const std_msgs::Float64::ConstPtr& msg)
+{
+    rel_alt = *msg;
+}
+void imuData_cb(const sensor_msgs::Imu::ConstPtr& msg)
+{
+	imu_data = *msg;
+}
+void magData_cb(const sensor_msgs::MagneticField::ConstPtr& msg)
+{
+	mag_data = *msg;
+}
+void staticPress_cb(const sensor_msgs::FluidPressure::ConstPtr& msg)
+{
+	static_press = *msg;
+}
+void diffPress_cb(const sensor_msgs::FluidPressure::ConstPtr& msg)
+{
+	diff_press = *msg;
+}
+void localPose_cb(const geometry_msgs::PoseStamped::ConstPtr& msg)
+{
+    current_pose = *msg;
+}
+void globalPosition_cb(const sensor_msgs::NavSatFix::ConstPtr& msg) 
+{
+    global_position = *msg;
+    global_position_received = true;
+}
+void gpsPosition_cb(const mavros_msgs::GPSRAW::ConstPtr& msg) 
+{
+    gps_position = *msg;
+	gps_position_received = true;
+}
+void battery_cb(const sensor_msgs::BatteryState::ConstPtr& msg) 
+{
+    current_batt = *msg;
+}
