@@ -284,6 +284,10 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
+    refpoint.latitude = global_position.latitude;
+    refpoint.longitude = global_position.longitude;
+    refpoint.altitude = global_position.altitude;
+
     int i = 0;
     if (input_type) // local setpoints
     {
@@ -464,9 +468,6 @@ int main(int argc, char **argv)
     }
     else // global setpoints
     {
-        refpoint.latitude = global_position.latitude;
-        refpoint.longitude = global_position.longitude;
-        refpoint.altitude = global_position.altitude;
         while (ros::ok())
         {
             if (i < (goal_num - 1))
