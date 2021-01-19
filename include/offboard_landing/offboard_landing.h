@@ -79,12 +79,12 @@ bool input_type = true; // true == input local || false == input global setpoint
 bool final_check = false; // true == reached final point || false == NOT final point
 float batt_percent; // baterry capacity
 
+float check_error = 0.1; // default = 0.1 m
 ros::Time t_check;
 
-geometry_msgs::Point enu_goal, enu_curr; //Local ENU points: converted from GPS goal and current
+geometry_msgs::Point enu_goal, enu_curr, enu_ref; //Local ENU points: converted from GPS goal and current
 geographic_msgs::GeoPoint wgs84_target, wgs84_curr; //Global WGS84 point: convert from ENU target and current
 geographic_msgs::GeoPoint refpoint; //Reference point to convert ECEF to ENU and vice versa
-
 
 /****** DEFINE FUNCTIONS ******/
 /********************************************************************************/
@@ -92,7 +92,7 @@ geographic_msgs::GeoPoint refpoint; //Reference point to convert ECEF to ENU and
 /***** input: x_target, y_target, ztarget, x_current, y_current, z_current ******/
 /***** return: true or false                                               ******/          
 /********************************************************************************/
-bool check_position(double, double, double,
+bool check_position(float, double, double, double,
 				    double, double, double);
 
 /*******************************************************************************************/
@@ -147,6 +147,7 @@ double radian(double);
 /***** return: distance in meters                                                       ******/
 /*********************************************************************************************/
 double measureGPS(double, double, double, double, double, double);
+double distanceLocal(double, double, double, double, double, double);
 
 /* WGS84ToECEF: Converts the WGS-84 Geodetic point (latitude, longitude, altitude) **
 ** to Earth-Centered Earth-Fixed (ECEF) coordinates (x, y, z)                      **/

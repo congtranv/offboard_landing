@@ -9,8 +9,10 @@ void creates(void);/*std::string, double, double, double,
                     double, double, double, double);*/
 void updates(std::string, double, double, double, 
                    double, double, double,
+                   double, double, double,
                    double, double, double, double);
 void updates_check(int, double, double, double, 
+                   double, double, double,
                    double, double, double,
                    double, double, double, double);
 void updates_local(int, double, double, double); 

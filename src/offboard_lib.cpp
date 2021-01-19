@@ -1,17 +1,17 @@
-#include "offboard_landing/offboard_landing.h"
-#include "offboard_landing/logging.h"
+#include <offboard_landing/offboard_landing.h>
+#include <offboard_landing/logging.h>
 
 /****** FUNCTIONS ******/
-bool check_position(double target_x, double target_y, double target_z,
+bool check_position(float error, double target_x, double target_y, double target_z,
 					double currentx, double currenty, double currentz)
 {
 	bool reached;
-	if(((target_x - 0.1) < currentx)
-	&& (currentx < (target_x + 0.1)) 
-	&& ((target_y - 0.1) < currenty)
-	&& (currenty < (target_y + 0.1))
-	&& ((target_z - 0.1) < currentz)
-	&& (currentz < (target_z + 0.1)))
+	if(((target_x - error) < currentx)
+	&& (currentx < (target_x + error)) 
+	&& ((target_y - error) < currenty)
+	&& (currenty < (target_y + error))
+	&& ((target_z - error) < currentz)
+	&& (currentz < (target_z + error)))
 	{
 		reached = 1;
 	}
@@ -85,15 +85,21 @@ void input_local_target()
 	for (int i = 0; i < target_num; i++)
 	{
 		std::cout << "Target (" << i+1 << ") position (in meter):" <<std::endl; 
-		std::cout << "pos_x_" << i+1 << ":"; std::cin >> target_pos[i][0];
-		std::cout << "pos_y_" << i+1 << ":"; std::cin >> target_pos[i][1];
-		std::cout << "pos_z_" << i+1 << ":"; std::cin >> target_pos[i][2];
+		std::cout << "pos_x_" << i+1 << ": "; std::cin >> target_pos[i][0];
+		std::cout << "pos_y_" << i+1 << ": "; std::cin >> target_pos[i][1];
+		std::cout << "pos_z_" << i+1 << ": "; std::cin >> target_pos[i][2];
 		updates_local(i, target_pos[i][0], target_pos[i][1], target_pos[i][2]);
 		// std::cout << "Target (" << i+1 << ") orientation (in degree):" <<std::endl; 
 		target_pos[i][3] = 0;
 		target_pos[i][4] = 0;
 		target_pos[i][5] = 0;
 		// std::cout << "yaw_" << i+1 << ":"; std::cin >> target_pos[i][5];
+	}
+	std::cout << "Check error value (0 < and < 1m): "; std::cin >> check_error;
+	if (check_error < 0 || check_error > 1) 
+	{
+		std::cout << "That error is out of range, set to default (0.1 m)" << std::endl;
+		check_error = 0.1;
 	}
 }
 
@@ -108,6 +114,12 @@ void input_global_target()
 		std::cout << "Longitude " << i+1 << " (in degree): "; std::cin >> goal_pos[i][1];
 		std::cout << "Altitude  " << i+1 << "  (in meter): "; std::cin >> goal_pos[i][2];
 		updates_global(i, goal_pos[i][0], goal_pos[i][1], goal_pos[i][2]);
+	}
+	std::cout << "Check error value (0 < and < 1m): "; std::cin >> check_error;
+	if (check_error < 0 || check_error > 1) 
+	{
+		std::cout << "That error is out of range, set to default (0.1 m)" << std::endl;
+		check_error = 0.1;
 	}
 }
 
@@ -173,6 +185,11 @@ double measureGPS(double lat1, double lon1, double alt1,
 		}
 	}
 	return Distance;
+}
+
+double distanceLocal(double x1, double y1, double z1, double x2, double y2, double z2)
+{
+	return sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2));
 }
 
 geometry_msgs::Point WGS84ToECEF(double lat, double lon, double alt)

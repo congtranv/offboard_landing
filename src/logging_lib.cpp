@@ -1,4 +1,5 @@
-#include "offboard_landing/logging.h"
+#include <offboard_landing/offboard_landing.h>
+#include <offboard_landing/logging.h>
 
 void creates()/*std::string name, double x_log, double y_log, double z_log, 
                 double lat_log, double lon_log, double alt_log,
@@ -8,8 +9,8 @@ void creates()/*std::string name, double x_log, double y_log, double z_log,
 	std::fstream file; 
 	file.open("position.csv", std::ios::out | std::ios::app); 
     
-	file << "Point, x (m), y (m), z (m), lat (degree), lon (degree), alt (m), gps_lat, gps_lon, gps_alt, rel alt (m) \n";
-    file << ", , , , , , , , , , \n";
+	file << "Point, x (m), y (m), z (m), x_convert (m), y_convert (m), z_convert (m), lat (degree), lon (degree), alt (m), gps_lat, gps_lon, gps_alt, rel alt (m) \n";
+    file << ", , , , , , , , , , , , , \n";
     // file << name << ", " << std::fixed << std::setprecision(6) << x_log << ", " 
 	// 					 << std::fixed << std::setprecision(6) << y_log << ", " 
 	// 					 << std::fixed << std::setprecision(6) << z_log << ", "
@@ -25,6 +26,7 @@ void creates()/*std::string name, double x_log, double y_log, double z_log,
 } 
 
 void updates(std::string name, double x_log, double y_log, double z_log, 
+                   double x_convert, double y_convert, double z_convert,
                    double lat_log, double lon_log, double alt_log,
                    double lat_gps, double lon_gps, double alt_gps,
                    double rel_alt) 
@@ -36,18 +38,22 @@ void updates(std::string name, double x_log, double y_log, double z_log,
     file << name << ", " << std::fixed << std::setprecision(6) << x_log << ", " 
 						 << std::fixed << std::setprecision(6) << y_log << ", " 
 						 << std::fixed << std::setprecision(6) << z_log << ", "
+                         << std::fixed << std::setprecision(6) << x_convert << ", " 
+						 << std::fixed << std::setprecision(6) << y_convert << ", " 
+						 << std::fixed << std::setprecision(6) << z_convert << ", "
 						 << std::fixed << std::setprecision(6) << lat_log << ", " 
 						 << std::fixed << std::setprecision(6) << lon_log << ", " 
-						 << std::fixed << std::setprecision(3) << alt_log << ", "
+						 << std::fixed << std::setprecision(6) << alt_log << ", "
                          << std::fixed << std::setprecision(6) << lat_gps << ", "
                          << std::fixed << std::setprecision(6) << lon_gps << ", "
-                         << std::fixed << std::setprecision(3) << alt_gps << ", "
-                         << std::fixed << std::setprecision(3) << rel_alt << "\n";
+                         << std::fixed << std::setprecision(6) << alt_gps << ", "
+                         << std::fixed << std::setprecision(6) << rel_alt << "\n";
 
 	file.close(); 
 } 
 
 void updates_check(int i, double x_log, double y_log, double z_log, 
+                   double x_convert, double y_convert, double z_convert,
                    double lat_log, double lon_log, double alt_log,
                    double lat_gps, double lon_gps, double alt_gps,
                    double rel_alt) 
@@ -59,13 +65,16 @@ void updates_check(int i, double x_log, double y_log, double z_log,
     file << "checkpoint " << i << ", " << std::fixed << std::setprecision(6) << x_log << ", " 
 									   << std::fixed << std::setprecision(6) << y_log << ", " 
 									   << std::fixed << std::setprecision(6) << z_log << ", "
+                                       << std::fixed << std::setprecision(6) << x_convert << ", " 
+                              	       << std::fixed << std::setprecision(6) << y_convert << ", " 
+						               << std::fixed << std::setprecision(6) << z_convert << ", "
          							   << std::fixed << std::setprecision(6) << lat_log << ", " 
 									   << std::fixed << std::setprecision(6) << lon_log << ", " 
-									   << std::fixed << std::setprecision(3) << alt_log << ", "
+									   << std::fixed << std::setprecision(6) << alt_log << ", "
                                        << std::fixed << std::setprecision(6) << lat_gps << ", "
                                        << std::fixed << std::setprecision(6) << lon_gps << ", "
-                                       << std::fixed << std::setprecision(3) << alt_gps << ", "
-                                       << std::fixed << std::setprecision(3) << rel_alt << "\n";
+                                       << std::fixed << std::setprecision(6) << alt_gps << ", "
+                                       << std::fixed << std::setprecision(6) << rel_alt << "\n";
 
 	file.close(); 
 } 
@@ -88,9 +97,9 @@ void updates_global(int num, double lat, double lon, double alt)
 
     file.open("position.csv", std::ios::out | std::ios::app); 
 
-    file << "global target " << num <<  ", , , , " << std::fixed << std::setprecision(6) << lat << ", " 
-												   << std::fixed << std::setprecision(6) << lon << ", " 
-												   << std::fixed << std::setprecision(6) << alt << "\n";
+    file << "global target " << num <<  ", , , , , , , " << std::fixed << std::setprecision(6) << lat << ", " 
+												         << std::fixed << std::setprecision(6) << lon << ", " 
+												         << std::fixed << std::setprecision(6) << alt << "\n";
 
 	file.close();
 }

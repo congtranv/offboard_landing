@@ -1,11 +1,10 @@
-#include "offboard_landing/offboard_landing.h"
-#include "offboard_landing/logging.h"
-
+#include <offboard_landing/offboard_landing.h>
+#include <offboard_landing/logging.h>
 
 int main(int argc, char **argv)
 {
     // initialize ros node
-    ros::init(argc, argv, "setpoint");
+    ros::init(argc, argv, "offboard");
     ros::NodeHandle nh;
 
     // subscriber
@@ -59,63 +58,148 @@ int main(int argc, char **argv)
         rate.sleep();
     }
     std::cout << "[ INFO] GPS position received \n";
-    std::cout << "[ INFO] Checking status...\n";
+    // std::cout << "[ INFO] Checking status...\n";
     ros::Duration(1).sleep();
 
 	// check current pose
-	for(int i = 100; ros::ok() && i > 0; --i)
-	{
-        std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
-                     current_pose.pose.position.x, 
-                     current_pose.pose.position.y, 
-                     current_pose.pose.position.z);
+	// for(int i = 100; ros::ok() && i > 0; --i)
+	// {
+    //     std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
+    //                  current_pose.pose.position.x, 
+    //                  current_pose.pose.position.y, 
+    //                  current_pose.pose.position.z);
 		
-        std::printf("Current GPS position: [%f, %f, %.3f]\n", 
-                     global_position.latitude, 
-                     global_position.longitude, 
-                     global_position.altitude);
+    //     std::printf("Current GPS position: [%f, %f, %.3f]\n", 
+    //                  global_position.latitude, 
+    //                  global_position.longitude, 
+    //                  global_position.altitude);
 
-        std::cout << "Current relative altitude: " << rel_alt.data << " m \n";
+    //     std::cout << "Current relative altitude: " << rel_alt.data << " m \n";
 
-        batt_percent = current_batt.percentage * 100;
-        std::printf("Current Battery capacity: %.1f \n", batt_percent);
-        std::cout << "\n";
-		ros::spinOnce();
-        rate.sleep();
-    }
-    std::cout << "[ INFO] Check status done \n";
+    //     batt_percent = current_batt.percentage * 100;
+    //     std::printf("Current Battery capacity: %.1f \n", batt_percent);
+    //     std::cout << "\n";
+	//     ros::spinOnce();
+    //     rate.sleep();
+    // }
+    // std::cout << "[ INFO] Check status done \n";
     
     creates();
     creates_sensor();
+
+    refpoint.latitude = global_position.latitude;
+    refpoint.longitude = global_position.longitude;
+    refpoint.altitude = global_position.altitude;
+    
+    std::cout << "[ INFO] Waiting for stable initial... \n";
+    
+    t_check = ros::Time::now();
+    while (ros::ok() && (ros::Time::now() - t_check) < ros::Duration(30))
+    {
+        gps_lat = double(gps_position.lat)/10000000;
+        gps_lon = double(gps_position.lon)/10000000;
+        gps_alt = double(gps_position.alt)/1000;
+
+        enu_curr = WGS84ToENU(global_position.latitude,
+                          global_position.longitude,
+                          global_position.altitude,
+                          refpoint.latitude, 
+                          refpoint.longitude, 
+                          refpoint.altitude);
+
+        updates("stabilizing", current_pose.pose.position.x,
+                               current_pose.pose.position.y,
+                               current_pose.pose.position.z,
+                               enu_curr.x, 
+                               enu_curr.y, 
+                               enu_curr.z,
+                               global_position.latitude,
+                               global_position.longitude,
+                               global_position.altitude,
+                               gps_lat, gps_lon, gps_alt, 
+                               rel_alt.data);
+        updates_sensor("stabilizing", imu_data.angular_velocity.x, 
+                                      imu_data.angular_velocity.y, 
+                                      imu_data.angular_velocity.z,
+                                      imu_data.linear_acceleration.x, 
+                                      imu_data.linear_acceleration.y, 
+                                      imu_data.linear_acceleration.z,
+                                      mag_data.magnetic_field.x, 
+                                      mag_data.magnetic_field.y, 
+                                      mag_data.magnetic_field.z,
+                                      static_press.fluid_pressure, 
+                                      diff_press.fluid_pressure);
+        ros::Duration(0.1).sleep();
+        ros::spinOnce();
+        rate.sleep();
+    }
+
+    std::cout << "[ INFO] Stable initial done \n";
+    ros::Duration(1).sleep();
+    
+    // init reference point
+    refpoint.latitude = global_position.latitude;
+    refpoint.longitude = global_position.longitude;
+    refpoint.altitude = global_position.altitude;
+
+    for(int i = 100; ros::ok() && i > 0; --i)
+    {
+        ros::spinOnce();
+        rate.sleep();
+    }
+
+    std::printf("\nCurrent global position: [%f, %f, %.3f]\n", 
+                global_position.latitude, 
+                global_position.longitude, 
+                global_position.altitude);
+    std::cout << "Current relative altitude: " << rel_alt.data << " m \n";
+        
+    std::printf("Reference GPS position: [%f, %f, %.3f]\n", 
+                    refpoint.latitude, 
+                    refpoint.longitude, 
+                    refpoint.altitude);
+    enu_curr = WGS84ToENU(global_position.latitude,
+                        global_position.longitude,
+                        global_position.altitude,
+                        refpoint.latitude, 
+                        refpoint.longitude, 
+                        refpoint.altitude);
+    enu_ref = enu_curr;
+    std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
+                current_pose.pose.position.x, 
+                current_pose.pose.position.y, 
+                current_pose.pose.position.z);
+    std::printf("Current converted position: [%.3f, %.3f, %.3f]\n", 
+                enu_curr.x, 
+                enu_curr.y, 
+                enu_curr.z);
     
     gps_lat = double(gps_position.lat)/10000000;
     gps_lon = double(gps_position.lon)/10000000;
     gps_alt = double(gps_position.alt)/1000;
 
-    // init reference point
-    refpoint.latitude = global_position.latitude;
-    refpoint.longitude = global_position.longitude;
-    refpoint.altitude = global_position.altitude;
-    std::printf("Reference GPS position: [%f, %f, %.3f]\n", 
-                     refpoint.latitude, 
-                     refpoint.longitude, 
-                     refpoint.altitude);
     updates("initial",  current_pose.pose.position.x,
                         current_pose.pose.position.y,
                         current_pose.pose.position.z,
+                        enu_curr.x,
+                        enu_curr.y,
+                        enu_curr.z,
                         global_position.latitude,
                         global_position.longitude,
                         global_position.altitude,
                         gps_lat, gps_lon, gps_alt, 
                         rel_alt.data);
-    updates("reference",  current_pose.pose.position.x,
-                        current_pose.pose.position.y,
-                        current_pose.pose.position.z,
-                        refpoint.latitude,
-                        refpoint.longitude,
-                        refpoint.altitude,
-                        gps_lat, gps_lon, gps_alt, 
-                        rel_alt.data);
+    updates("reference", current_pose.pose.position.x,
+                         current_pose.pose.position.y,
+                         current_pose.pose.position.z,
+                         enu_ref.x,
+                         enu_ref.y,
+                         enu_ref.z,
+                         refpoint.latitude,
+                         refpoint.longitude,
+                         refpoint.altitude,
+                         gps_lat, gps_lon, gps_alt, 
+                         rel_alt.data);
     updates_sensor("initial", imu_data.angular_velocity.x, 
                               imu_data.angular_velocity.y, 
                               imu_data.angular_velocity.z,
@@ -127,7 +211,6 @@ int main(int argc, char **argv)
                               mag_data.magnetic_field.z,
                               static_press.fluid_pressure, 
                               diff_press.fluid_pressure);
-
     // set target pose
     input_target();
     if (input_type == true) // local setpoint
@@ -138,8 +221,12 @@ int main(int argc, char **argv)
     }
     else // global setpoint
     {
-        enu_goal = WGS84ToENU(goal_pos[0][0], goal_pos[0][1], goal_pos[0][2],
-                    refpoint.latitude, refpoint.longitude, refpoint.altitude);
+        enu_goal = WGS84ToENU(goal_pos[0][0], 
+                              goal_pos[0][1], 
+                              goal_pos[0][2],
+                              refpoint.latitude, 
+                              refpoint.longitude, 
+                              refpoint.altitude);
         target_pose.pose.position.x = enu_goal.x;
         target_pose.pose.position.y = enu_goal.y;
         target_pose.pose.position.z = enu_goal.z;
@@ -159,9 +246,19 @@ int main(int argc, char **argv)
     gps_lat = double(gps_position.lat)/10000000;
     gps_lon = double(gps_position.lon)/10000000;
     gps_alt = double(gps_position.alt)/1000;
+
+    enu_curr = WGS84ToENU(global_position.latitude,
+                          global_position.longitude,
+                          global_position.altitude,
+                          refpoint.latitude, 
+                          refpoint.longitude, 
+                          refpoint.altitude);
     updates("pre-flight", current_pose.pose.position.x,
                           current_pose.pose.position.y,
                           current_pose.pose.position.z,
+                          enu_curr.x,
+                          enu_curr.y,
+                          enu_curr.z,
                           global_position.latitude,
                           global_position.longitude,
                           global_position.altitude,
@@ -179,29 +276,19 @@ int main(int argc, char **argv)
                                  static_press.fluid_pressure, 
                                  diff_press.fluid_pressure);
     ros::Duration(1).sleep();
-
+    
+    std::cout << "[ INFO] Waiting arm and takeoff... \n";
     while (ros::ok() && !current_state.armed)
     {
-        std::cout << "[ INFO] Waiting arm and takeoff... \n";
-        
         ros::spinOnce();
         rate.sleep();
     }
 
     int i = 0;
-    if (input_type)
+    if (input_type) // local setpoints
     {
         while (ros::ok())
         {
-            std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
-                         current_pose.pose.position.x, 
-                         current_pose.pose.position.y, 
-                         current_pose.pose.position.z);
-            std::printf("Next local position: [%.3f, %.3f, %.3f]\n", 
-                                target_pos[i][0], 
-                                target_pos[i][1],
-                                target_pos[i][2]);
-
             if (i < (target_num -1))
             {
                 final_check = false;
@@ -226,8 +313,24 @@ int main(int argc, char **argv)
         		ros::spinOnce();
                 rate.sleep();
             }
+            std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
+                         current_pose.pose.position.x, 
+                         current_pose.pose.position.y, 
+                         current_pose.pose.position.z);
+            std::printf("Next local position: [%.3f, %.3f, %.3f]\n", 
+                                target_pos[i][0], 
+                                target_pos[i][1],
+                                target_pos[i][2]);
+            distance = distanceLocal(current_pose.pose.position.x, 
+                                     current_pose.pose.position.y, 
+                                     current_pose.pose.position.z,
+                                     target_pos[i][0], 
+                                     target_pos[i][1], 
+                                     target_pos[i][2]);
+            std::printf("Distance to next goal: %.3f m \n", distance);
 
-            bool check = check_position(target_pose.pose.position.x,
+            bool check = check_position(check_error,
+                                        target_pose.pose.position.x,
                                         target_pose.pose.position.y,
                                         target_pose.pose.position.z,
                                         current_pose.pose.position.x,
@@ -241,21 +344,31 @@ int main(int argc, char **argv)
                                 current_pose.pose.position.x, 
                                 current_pose.pose.position.y, 
                                 current_pose.pose.position.z);   
-                // std::printf("[ INFO] Next local position: [%.3f, %.3f, %.3f]\n", 
-                //                 target_pos[i+1][0], 
-                //                 target_pos[i+1][1],
-                //                 target_pos[i+1][2]);
-            
+                std::printf("[ INFO] Next local position: [%.3f, %.3f, %.3f]\n", 
+                                target_pos[i+1][0], 
+                                target_pos[i+1][1],
+                                target_pos[i+1][2]);
+                std::cout << "[ INFO] Hover at checkpoint \n";
+
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
+                enu_curr = WGS84ToENU(global_position.latitude,
+                          global_position.longitude,
+                          global_position.altitude,
+                          refpoint.latitude, 
+                          refpoint.longitude, 
+                          refpoint.altitude);
                 updates_check(i+1, current_pose.pose.position.x,
-                                    current_pose.pose.position.y,
-                                    current_pose.pose.position.z,
-                                    global_position.latitude,
-                                    global_position.longitude,
-                                    global_position.altitude,
-                                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                                   current_pose.pose.position.y,
+                                   current_pose.pose.position.z,
+                                   enu_curr.x,
+                                   enu_curr.y,
+                                   enu_curr.z,
+                                   global_position.latitude,
+                                   global_position.longitude,
+                                   global_position.altitude,
+                                   gps_lat, gps_lon, gps_alt, rel_alt.data);
                 updates_check_ss(i+1, imu_data.angular_velocity.x, 
                                       imu_data.angular_velocity.y,
                                       imu_data.angular_velocity.z,
@@ -267,14 +380,9 @@ int main(int argc, char **argv)
                                       mag_data.magnetic_field.z,
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
-                // ros::Duration(5).sleep();
+
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
-                    std::cout << "[ INFO] Hover at checkpoint \n";
-                    std::printf("[ INFO] Next local position: [%.3f, %.3f, %.3f]\n", 
-                                target_pos[i+1][0], 
-                                target_pos[i+1][1],
-                                target_pos[i+1][2]);
                     local_pos_pub.publish(target_pose);
 
                     ros::spinOnce();
@@ -292,15 +400,23 @@ int main(int argc, char **argv)
                                 current_pose.pose.position.x, 
                                 current_pose.pose.position.y, 
                                 current_pose.pose.position.z);
-    		        
-                // std::printf("[ INFO] Ready to LANDING \n");
+                std::printf("[ INFO] Ready to LANDING \n");
             
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
+                enu_curr = WGS84ToENU(global_position.latitude,
+                          global_position.longitude,
+                          global_position.altitude,
+                          refpoint.latitude, 
+                          refpoint.longitude, 
+                          refpoint.altitude);
                 updates_check(i+1, current_pose.pose.position.x,
                                    current_pose.pose.position.y,
                                    current_pose.pose.position.z,
+                                   enu_curr.x,
+                                   enu_curr.y,
+                                   enu_curr.z,
                                    global_position.latitude,
                                    global_position.longitude,
                                    global_position.altitude,
@@ -316,10 +432,9 @@ int main(int argc, char **argv)
                                       mag_data.magnetic_field.z,
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
-                // ros::Duration(5).sleep();
+
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
-                    std::printf("[ INFO] Ready to LANDING \n");
                     local_pos_pub.publish(target_pose);
 
                     ros::spinOnce();
@@ -338,7 +453,7 @@ int main(int argc, char **argv)
             }
     		else 
     		{
-    			continue;
+    			// continue;
     			ros::spinOnce();
     		    rate.sleep();
     		} 
@@ -347,29 +462,22 @@ int main(int argc, char **argv)
             rate.sleep();
         }
     }
-    else
+    else // global setpoints
     {
+        refpoint.latitude = global_position.latitude;
+        refpoint.longitude = global_position.longitude;
+        refpoint.altitude = global_position.altitude;
         while (ros::ok())
         {
-            std::printf("Current GPS position: [%f, %f, %.3f]\n", 
-                        global_position.latitude, 
-                        global_position.longitude, 
-                        global_position.altitude);
-            std::printf("Next GPS position: [%f, %f, %.3f]\n", 
-                                goal_pos[i][0], 
-                                goal_pos[i][1],
-                                goal_pos[i][2]);
-            distance = measureGPS(global_position.latitude, 
-                                global_position.longitude, 
-                                global_position.altitude, 
-                                goal_pos[i][0], goal_pos[i][1], goal_pos[i][2]);
-            std::printf("Distance to next goal: %.2f m \n", distance);
-            
             if (i < (goal_num - 1))
             {
                 final_check = false;
-                enu_goal = WGS84ToENU(goal_pos[i][0], goal_pos[i][1], goal_pos[i][2],
-                           refpoint.latitude, refpoint.longitude, refpoint.altitude);
+                enu_goal = WGS84ToENU(goal_pos[i][0], 
+                                      goal_pos[i][1], 
+                                      goal_pos[i][2],
+                                      refpoint.latitude, 
+                                      refpoint.longitude, 
+                                      refpoint.altitude);
                 target_pose.pose.position.x = enu_goal.x;
                 target_pose.pose.position.y = enu_goal.y;
                 target_pose.pose.position.z = enu_goal.z;
@@ -386,7 +494,9 @@ int main(int argc, char **argv)
                 enu_goal = WGS84ToENU(goal_pos[goal_num-1][0], 
                                       goal_pos[goal_num-1][1], 
                                       goal_pos[goal_num-1][2],
-                           refpoint.latitude, refpoint.longitude, refpoint.altitude);
+                                      refpoint.latitude, 
+                                      refpoint.longitude, 
+                                      refpoint.altitude);
                 target_pose.pose.position.x = enu_goal.x;
                 target_pose.pose.position.y = enu_goal.y;
                 target_pose.pose.position.z = enu_goal.z;
@@ -397,13 +507,33 @@ int main(int argc, char **argv)
                 ros::spinOnce();
                 rate.sleep();
             }
+            std::printf("\nCurrent GPS position: [%f, %f, %.3f]\n", 
+                        global_position.latitude, 
+                        global_position.longitude, 
+                        global_position.altitude);
+            std::printf("Next GPS position: [%f, %f, %.3f]\n", 
+                                goal_pos[i][0], 
+                                goal_pos[i][1],
+                                goal_pos[i][2]);
+            // distance = measureGPS(global_position.latitude, 
+            //                       global_position.longitude, 
+            //                       global_position.altitude, 
+            //                       goal_pos[i][0], 
+            //                       goal_pos[i][1], 
+            //                       goal_pos[i][2]);
+                        
             enu_curr = WGS84ToENU(global_position.latitude,
                                   global_position.longitude,
                                   global_position.altitude,
                                   refpoint.latitude, 
                                   refpoint.longitude, 
                                   refpoint.altitude);
-            bool check = check_position(enu_goal.x, enu_goal.y, enu_goal.z,
+            distance = distanceLocal(enu_goal.x, enu_goal.y, enu_goal.z,
+                                     enu_curr.x, enu_curr.y, enu_curr.z);
+            std::printf("Distance to next goal: %.3f m \n", distance);
+
+            bool check = check_position(check_error,
+                                        enu_goal.x, enu_goal.y, enu_goal.z,
                                         enu_curr.x, enu_curr.y, enu_curr.z);
             std::cout << check << std::endl;
             if (check && !final_check)
@@ -413,16 +543,21 @@ int main(int argc, char **argv)
                                 global_position.latitude, 
                                 global_position.longitude, 
                                 global_position.altitude);
-                // std::printf("[ INFO] Next GPS position: [%f, %f, %.3f]\n", 
-                //                 goal_pos[i+1][0], 
-                //                 goal_pos[i+1][1],
-                //                 goal_pos[i+1][2]);
+                std::printf("[ INFO] Next GPS position: [%f, %f, %.3f]\n", 
+                                goal_pos[i+1][0], 
+                                goal_pos[i+1][1],
+                                goal_pos[i+1][2]);
+                std::cout << "[ INFO] Hover at checkpoint \n";
+
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
                 updates_check(i+1, current_pose.pose.position.x,
                                    current_pose.pose.position.y,
                                    current_pose.pose.position.z,
+                                   enu_curr.x,
+                                   enu_curr.y,
+                                   enu_curr.z,
                                    global_position.latitude,
                                    global_position.longitude,
                                    global_position.altitude,
@@ -438,14 +573,9 @@ int main(int argc, char **argv)
                                       mag_data.magnetic_field.z,
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
-                // ros::Duration(5).sleep();
+
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
-                    std::cout << "[ INFO] Hover at checkpoint \n";
-                    std::printf("[ INFO] Next GPS position: [%f, %f, %.3f]\n", 
-                                goal_pos[i+1][0], 
-                                goal_pos[i+1][1],
-                                goal_pos[i+1][2]);
                     local_pos_pub.publish(target_pose);
 
                     ros::spinOnce();
@@ -463,13 +593,16 @@ int main(int argc, char **argv)
                                 global_position.latitude, 
                                 global_position.longitude, 
                                 global_position.altitude);
-                // std::printf("[ INFO] Ready to LANDING \n");
+                std::printf("[ INFO] Ready to LANDING \n");
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
                 updates_check(i+1, current_pose.pose.position.x,
                                    current_pose.pose.position.y,
                                    current_pose.pose.position.z,
+                                   enu_curr.x,
+                                   enu_curr.y,
+                                   enu_curr.z,
                                    global_position.latitude,
                                    global_position.longitude,
                                    global_position.altitude,
@@ -485,10 +618,9 @@ int main(int argc, char **argv)
                                       mag_data.magnetic_field.z,
                                       static_press.fluid_pressure, 
                                       diff_press.fluid_pressure);
-                // ros::Duration(5).sleep();
+
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
-                    std::printf("[ INFO] Ready to LANDING \n");
                     local_pos_pub.publish(target_pose);
 
                     ros::spinOnce();
@@ -507,7 +639,7 @@ int main(int argc, char **argv)
             }
             else 
             {
-                continue;
+                // continue;
                 ros::spinOnce();
                 rate.sleep();
             } 
