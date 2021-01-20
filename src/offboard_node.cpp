@@ -58,32 +58,8 @@ int main(int argc, char **argv)
         rate.sleep();
     }
     std::cout << "[ INFO] GPS position received \n";
-    // std::cout << "[ INFO] Checking status...\n";
     ros::Duration(1).sleep();
 
-	// check current pose
-	// for(int i = 100; ros::ok() && i > 0; --i)
-	// {
-    //     std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
-    //                  current_pose.pose.position.x, 
-    //                  current_pose.pose.position.y, 
-    //                  current_pose.pose.position.z);
-		
-    //     std::printf("Current GPS position: [%f, %f, %.3f]\n", 
-    //                  global_position.latitude, 
-    //                  global_position.longitude, 
-    //                  global_position.altitude);
-
-    //     std::cout << "Current relative altitude: " << rel_alt.data << " m \n";
-
-    //     batt_percent = current_batt.percentage * 100;
-    //     std::printf("Current Battery capacity: %.1f \n", batt_percent);
-    //     std::cout << "\n";
-	//     ros::spinOnce();
-    //     rate.sleep();
-    // }
-    // std::cout << "[ INFO] Check status done \n";
-    
     creates();
     creates_sensor();
 
@@ -317,11 +293,11 @@ int main(int argc, char **argv)
         		ros::spinOnce();
                 rate.sleep();
             }
-            std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
+            std::printf("\nCurrent local position: [%.3f, %.3f, %.3f]\n", 
                          current_pose.pose.position.x, 
                          current_pose.pose.position.y, 
                          current_pose.pose.position.z);
-            std::printf("Next local position: [%.3f, %.3f, %.3f]\n", 
+            std::printf("Target local position: [%.3f, %.3f, %.3f]\n", 
                                 target_pos[i][0], 
                                 target_pos[i][1],
                                 target_pos[i][2]);
@@ -331,7 +307,7 @@ int main(int argc, char **argv)
                                      target_pos[i][0], 
                                      target_pos[i][1], 
                                      target_pos[i][2]);
-            std::printf("Distance to next goal: %.3f m \n", distance);
+            std::printf("Distance to target: %.3f m \n", distance);
 
             bool check = check_position(check_error,
                                         target_pose.pose.position.x,
@@ -340,7 +316,7 @@ int main(int argc, char **argv)
                                         current_pose.pose.position.x,
                                         current_pose.pose.position.y,
                                         current_pose.pose.position.z);
-            std::cout << check << std::endl;
+            std::cout << "\n" << check << std::endl;
             if(check && !final_check)
             {
                 t_check = ros::Time::now();
@@ -512,31 +488,33 @@ int main(int argc, char **argv)
                         global_position.latitude, 
                         global_position.longitude, 
                         global_position.altitude);
-            std::printf("Next GPS position: [%f, %f, %.3f]\n", 
+            std::printf("Goal GPS position: [%f, %f, %.3f]\n", 
                                 goal_pos[i][0], 
                                 goal_pos[i][1],
                                 goal_pos[i][2]);
-            // distance = measureGPS(global_position.latitude, 
-            //                       global_position.longitude, 
-            //                       global_position.altitude, 
-            //                       goal_pos[i][0], 
-            //                       goal_pos[i][1], 
-            //                       goal_pos[i][2]);
-                        
+                                  
             enu_curr = WGS84ToENU(global_position.latitude,
                                   global_position.longitude,
                                   global_position.altitude,
                                   refpoint.latitude, 
                                   refpoint.longitude, 
                                   refpoint.altitude);
+            std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
+                                enu_curr.x, 
+                                enu_curr.y, 
+                                enu_curr.z);   
+            std::printf("Target local position: [%.3f, %.3f, %.3f]\n", 
+                                enu_goal.x, 
+                                enu_goal.y,
+                                enu_goal.z);
             distance = distanceLocal(enu_goal.x, enu_goal.y, enu_goal.z,
                                      enu_curr.x, enu_curr.y, enu_curr.z);
-            std::printf("Distance to next goal: %.3f m \n", distance);
+            std::printf("Distance to goal: %.3f m \n", distance);
 
             bool check = check_position(check_error,
                                         enu_goal.x, enu_goal.y, enu_goal.z,
                                         enu_curr.x, enu_curr.y, enu_curr.z);
-            std::cout << check << std::endl;
+            std::cout << "\n" << check << std::endl;
             if (check && !final_check)
             {
                 t_check = ros::Time::now();
@@ -548,6 +526,14 @@ int main(int argc, char **argv)
                                 goal_pos[i+1][0], 
                                 goal_pos[i+1][1],
                                 goal_pos[i+1][2]);
+                std::printf("[ INFO] Reached local position: [%.3f, %.3f, %.3f]\n", 
+                                    enu_curr.x, 
+                                    enu_curr.y, 
+                                    enu_curr.z);   
+                std::printf("[ INFO] Target local position: [%.3f, %.3f, %.3f]\n", 
+                                    enu_goal.x, 
+                                    enu_goal.y,
+                                    enu_goal.z);
                 std::cout << "[ INFO] Hover at checkpoint \n";
 
                 gps_lat = double(gps_position.lat)/10000000;
@@ -594,6 +580,10 @@ int main(int argc, char **argv)
                                 global_position.latitude, 
                                 global_position.longitude, 
                                 global_position.altitude);
+                std::printf("[ INFO] Reached local position: [%.3f, %.3f, %.3f]\n", 
+                                    enu_curr.x, 
+                                    enu_curr.y, 
+                                    enu_curr.z);
                 std::printf("[ INFO] Ready to LANDING \n");
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
