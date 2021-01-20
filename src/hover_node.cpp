@@ -85,8 +85,15 @@ int main(int argc, char **argv)
         target_pose.header.stamp = ros::Time::now();   
         local_pos_pub.publish(target_pose);
 
-        ros::spinOnce();
-        rate.sleep();
+        if (!current_state.armed)
+        {
+            break;
+        }
+        else
+        {
+            ros::spinOnce();
+            rate.sleep();
+        }
     }
 
     return 0;
