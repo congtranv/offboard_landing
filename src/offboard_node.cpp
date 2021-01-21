@@ -118,11 +118,11 @@ int main(int argc, char **argv)
     refpoint.longitude = global_position.longitude;
     refpoint.altitude = global_position.altitude;
 
-    for(int i = 100; ros::ok() && i > 0; --i)
-    {
-        ros::spinOnce();
-        rate.sleep();
-    }
+//    for(int i = 100; ros::ok() && i > 0; --i)
+//    {
+//        ros::spinOnce();
+//        rate.sleep();
+//    }
 
     std::printf("\nCurrent global position: [%f, %f, %.3f]\n", 
                 global_position.latitude, 
@@ -260,9 +260,9 @@ int main(int argc, char **argv)
         rate.sleep();
     }
 
-    refpoint.latitude = global_position.latitude;
-    refpoint.longitude = global_position.longitude;
-    refpoint.altitude = global_position.altitude;
+//    refpoint.latitude = global_position.latitude;
+//    refpoint.longitude = global_position.longitude;
+//    refpoint.altitude = global_position.altitude;
 
     int i = 0;
     if (input_type) // local setpoints
