@@ -126,21 +126,49 @@ void input_global_target()
 void input_target()
 {
 	char c;
-	std::cout << "Waypoint type: (1) Local || (2) Global ? (1/2) \n"; std::cin >> c;
+	std::cout << "Manual Input (1) || Load Parameter (2) ? (1/2)\n"; std::cin >> c;
 	if (c == '1')
 	{
-		input_local_target();
-		input_type = true;
+		std::cout << "Waypoint type: (3) Local || (4) Global ? (3/4) \n"; std::cin >> c;
+		if (c == '3')
+		{
+			input_local_target();
+			input_type = true;
+		}
+		else if (c == '4')
+		{
+			input_global_target();
+			input_type = false;
+		}
+		else input_target();
+
 	}
 	else if (c == '2')
 	{
-		input_global_target();
-		input_type = false;
+		std::cout << "Waypoint type: (3) Local || (4) Global ? (3/4) \n"; std::cin >> c;
+		if (c == '3')
+		{
+			input_type = true;
+			ros::param::get("num_of_target", in_num_of_target);
+			ros::param::get("x_pos", in_x_pos);
+			ros::param::get("y_pos", in_y_pos);
+			ros::param::get("z_pos", in_z_pos);
+		}
+		else if (c == '4')
+		{
+			input_type = false;
+			ros::param::get("num_of_goal", in_num_of_goal);
+			ros::param::get("latitude", in_latitude);
+			ros::param::get("longitude", in_longitude);
+			ros::param::get("altitude", in_altitude);
+		}
+		else input_target();
 	}
 	else 
 	{
 		input_target();
 	}
+	
 }
 
 double degree(double rad)

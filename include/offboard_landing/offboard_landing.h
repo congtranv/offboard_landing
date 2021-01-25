@@ -25,6 +25,7 @@
 #include <iostream>
 #include <cmath>
 #include <cstdio>
+#include <vector>
 
 /****** DEFINE CONSTANTS ******/
 const double PI  =3.141592653589793238463;
@@ -74,6 +75,16 @@ double r, p, y; // roll, pitch, yaw use in transform
 int goal_num; // number of global setpoints
 double goal_pos[10][3]; // global setpoints list
 double distance;
+
+int in_num_of_goal;
+std::vector<double> in_latitude;
+std::vector<double> in_longitude;
+std::vector<double> in_altitude;
+
+int in_num_of_target;
+std::vector<double> in_x_pos;
+std::vector<double> in_y_pos;
+std::vector<double> in_z_pos;
 
 bool input_type = true; // true == input local || false == input global setpoints
 bool final_check = false; // true == reached final point || false == NOT final point

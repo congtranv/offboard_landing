@@ -51,30 +51,34 @@ int main(int argc, char **argv)
     }
     std::cout << "[ INFO] GPS position received \n";
 
+    // test ros::param::get()
+    system("rosparam load $HOME/ros/catkin_ws/src/offboard_landing/config/waypoints.yaml");
+    std::cout << "[ INFO] Load parameters" << std::endl;
+
     creates();
     creates_sensor();
 
-    refpoint.latitude = global_position.latitude;
-    refpoint.longitude = global_position.longitude;
-    refpoint.altitude = global_position.altitude;
-    enu_curr = WGS84ToENU(global_position.latitude,
-                        global_position.longitude,
-                        global_position.altitude,
-                        refpoint.latitude, 
-                        refpoint.longitude, 
-                        refpoint.altitude);
-    enu_ref = enu_curr;
-    updates("reference", current_pose.pose.position.x,
-                         current_pose.pose.position.y,
-                         current_pose.pose.position.z,
-                         enu_ref.x,
-                         enu_ref.y,
-                         enu_ref.z,
-                         refpoint.latitude,
-                         refpoint.longitude,
-                         refpoint.altitude,
-                         gps_lat, gps_lon, gps_alt, 
-                         rel_alt.data);
+    // refpoint.latitude = global_position.latitude;
+    // refpoint.longitude = global_position.longitude;
+    // refpoint.altitude = global_position.altitude;
+    // enu_curr = WGS84ToENU(global_position.latitude,
+    //                     global_position.longitude,
+    //                     global_position.altitude,
+    //                     refpoint.latitude, 
+    //                     refpoint.longitude, 
+    //                     refpoint.altitude);
+    // enu_ref = enu_curr;
+    // updates("reference", current_pose.pose.position.x,
+    //                      current_pose.pose.position.y,
+    //                      current_pose.pose.position.z,
+    //                      enu_ref.x,
+    //                      enu_ref.y,
+    //                      enu_ref.z,
+    //                      refpoint.latitude,
+    //                      refpoint.longitude,
+    //                      refpoint.altitude,
+    //                      gps_lat, gps_lon, gps_alt, 
+    //                      rel_alt.data);
     
     std::cout << "[ INFO] Waiting for stable initial... \n";
     
@@ -122,10 +126,10 @@ int main(int argc, char **argv)
     std::cout << "[ INFO] Stable initial done \n";
     ros::Duration(1).sleep();
     
-    // // init reference point
-    // refpoint.latitude = global_position.latitude;
-    // refpoint.longitude = global_position.longitude;
-    // refpoint.altitude = global_position.altitude;
+    // init reference point
+    refpoint.latitude = global_position.latitude;
+    refpoint.longitude = global_position.longitude;
+    refpoint.altitude = global_position.altitude;
 
     // for(int i = 100; ros::ok() && i > 0; --i)
     // {
@@ -362,12 +366,12 @@ int main(int argc, char **argv)
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
-                enu_curr = WGS84ToENU(global_position.latitude,
-                          global_position.longitude,
-                          global_position.altitude,
-                          refpoint.latitude, 
-                          refpoint.longitude, 
-                          refpoint.altitude);
+                // enu_curr = WGS84ToENU(global_position.latitude,
+                //           global_position.longitude,
+                //           global_position.altitude,
+                //           refpoint.latitude, 
+                //           refpoint.longitude, 
+                //           refpoint.altitude);
                 updates_check(i+1, current_pose.pose.position.x,
                                    current_pose.pose.position.y,
                                    current_pose.pose.position.z,
@@ -414,12 +418,12 @@ int main(int argc, char **argv)
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
-                enu_curr = WGS84ToENU(global_position.latitude,
-                          global_position.longitude,
-                          global_position.altitude,
-                          refpoint.latitude, 
-                          refpoint.longitude, 
-                          refpoint.altitude);
+                // enu_curr = WGS84ToENU(global_position.latitude,
+                //           global_position.longitude,
+                //           global_position.altitude,
+                //           refpoint.latitude, 
+                //           refpoint.longitude, 
+                //           refpoint.altitude);
                 updates_check(i+1, current_pose.pose.position.x,
                                    current_pose.pose.position.y,
                                    current_pose.pose.position.z,
@@ -462,7 +466,6 @@ int main(int argc, char **argv)
             }
     		else 
     		{
-    			// continue;
     			ros::spinOnce();
     		    rate.sleep();
     		} 
@@ -522,12 +525,12 @@ int main(int argc, char **argv)
                                 goal_pos[i][1],
                                 goal_pos[i][2]);
                                   
-            enu_curr = WGS84ToENU(global_position.latitude,
-                                  global_position.longitude,
-                                  global_position.altitude,
-                                  refpoint.latitude, 
-                                  refpoint.longitude, 
-                                  refpoint.altitude);
+            // enu_curr = WGS84ToENU(global_position.latitude,
+            //                       global_position.longitude,
+            //                       global_position.altitude,
+            //                       refpoint.latitude, 
+            //                       refpoint.longitude, 
+            //                       refpoint.altitude);
             // std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
             //                     enu_curr.x, 
             //                     enu_curr.y, 
@@ -650,6 +653,7 @@ int main(int argc, char **argv)
                                 target_pose.pose.position.y,
                                 target_pose.pose.position.z);
                 std::printf("[ INFO] Ready to LANDING \n");
+
                 gps_lat = double(gps_position.lat)/10000000;
                 gps_lon = double(gps_position.lon)/10000000;
                 gps_alt = double(gps_position.alt)/1000;
@@ -695,7 +699,6 @@ int main(int argc, char **argv)
             }
             else 
             {
-                // continue;
                 ros::spinOnce();
                 rate.sleep();
             } 
