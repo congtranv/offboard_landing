@@ -145,22 +145,53 @@ void input_target()
 	}
 	else if (c == '2')
 	{
+		system("rosparam load $HOME/ros/catkin_ws/src/offboard_landing/config/waypoints.yaml");
+    	std::cout << "[ INFO] Load parameters" << std::endl;
+		ros::param::get("num_of_target", in_num_of_target);
+		ros::param::get("x_pos", in_x_pos);
+		ros::param::get("y_pos", in_y_pos);
+		ros::param::get("z_pos", in_z_pos);
+		ros::param::get("target_error", local_error);
+		ros::param::get("num_of_goal", in_num_of_goal);
+		ros::param::get("latitude", in_latitude);
+		ros::param::get("longitude", in_longitude);
+		ros::param::get("altitude", in_altitude);
+		ros::param::get("goal_error", global_error);
+
 		std::cout << "Waypoint type: (3) Local || (4) Global ? (3/4) \n"; std::cin >> c;
 		if (c == '3')
 		{
 			input_type = true;
-			ros::param::get("num_of_target", in_num_of_target);
-			ros::param::get("x_pos", in_x_pos);
-			ros::param::get("y_pos", in_y_pos);
-			ros::param::get("z_pos", in_z_pos);
+			check_error = local_error;
+			target_num = in_num_of_target;
+			for (int i = 0; i < target_num; i++)
+			{
+				target_pos[i][0] = in_x_pos[i];
+				target_pos[i][1] = in_y_pos[i];
+				target_pos[i][2] = in_z_pos[i];
+				std::cout << "Target (" << i+1 << "): [" << target_pos[i][0] << ", "
+														 << target_pos[i][1] << ", "
+														 << target_pos[i][2] << "]" << std::endl;
+				updates_local(i+1, target_pos[i][0], target_pos[i][1], target_pos[i][2]);
+			}
+			std::cout << "Check error value: " << check_error << std::endl;
 		}
 		else if (c == '4')
 		{
 			input_type = false;
-			ros::param::get("num_of_goal", in_num_of_goal);
-			ros::param::get("latitude", in_latitude);
-			ros::param::get("longitude", in_longitude);
-			ros::param::get("altitude", in_altitude);
+			check_error = global_error;
+			goal_num = in_num_of_goal;
+			for (int i = 0; i < goal_num; i++)
+			{
+				goal_pos[i][0] = in_latitude[i];
+				goal_pos[i][1] = in_longitude[i];
+				goal_pos[i][2] = in_altitude[i];
+				updates_global(i+1, goal_pos[i][0], goal_pos[i][1], goal_pos[i][2]);
+				std::cout << "Goal (" << i+1 << "): [" << goal_pos[i][0] << ", "
+													   << goal_pos[i][1] << ", "
+													   << goal_pos[i][2] << "]" << std::endl;
+			}
+			std::cout << "Check error value: " << check_error << std::endl;
 		}
 		else input_target();
 	}

@@ -52,8 +52,8 @@ int main(int argc, char **argv)
     std::cout << "[ INFO] GPS position received \n";
 
     // test ros::param::get()
-    system("rosparam load $HOME/ros/catkin_ws/src/offboard_landing/config/waypoints.yaml");
-    std::cout << "[ INFO] Load parameters" << std::endl;
+    // system("rosparam load $HOME/ros/catkin_ws/src/offboard_landing/config/waypoints.yaml");
+    // std::cout << "[ INFO] Load parameters" << std::endl;
 
     creates();
     creates_sensor();
@@ -99,9 +99,7 @@ int main(int argc, char **argv)
         updates("stabilizing", current_pose.pose.position.x,
                                current_pose.pose.position.y,
                                current_pose.pose.position.z,
-                               enu_curr.x, 
-                               enu_curr.y, 
-                               enu_curr.z,
+                               0, 0, 0,
                                global_position.latitude,
                                global_position.longitude,
                                global_position.altitude,
@@ -223,6 +221,8 @@ int main(int argc, char **argv)
         z_offset = z_offset + z_off[i]/100;
     }
     std::printf("\nOffset: [%f, %f, %f]\n", x_offset, y_offset, z_offset);
+    updates("Offset", 0, 0, 0, x_offset, y_offset, z_offset,
+                      0, 0, 0, 0, 0, 0, 0);
      
     // set target pose
     input_target();
@@ -363,40 +363,71 @@ int main(int argc, char **argv)
                                 target_pos[i+1][2]);
                 std::cout << "[ INFO] Hover at checkpoint \n";
 
-                gps_lat = double(gps_position.lat)/10000000;
-                gps_lon = double(gps_position.lon)/10000000;
-                gps_alt = double(gps_position.alt)/1000;
+                // gps_lat = double(gps_position.lat)/10000000;
+                // gps_lon = double(gps_position.lon)/10000000;
+                // gps_alt = double(gps_position.alt)/1000;
                 // enu_curr = WGS84ToENU(global_position.latitude,
                 //           global_position.longitude,
                 //           global_position.altitude,
                 //           refpoint.latitude, 
                 //           refpoint.longitude, 
                 //           refpoint.altitude);
-                updates_check(i+1, current_pose.pose.position.x,
-                                   current_pose.pose.position.y,
-                                   current_pose.pose.position.z,
-                                   enu_curr.x,
-                                   enu_curr.y,
-                                   enu_curr.z,
-                                   global_position.latitude,
-                                   global_position.longitude,
-                                   global_position.altitude,
-                                   gps_lat, gps_lon, gps_alt, rel_alt.data);
-                updates_check_ss(i+1, imu_data.angular_velocity.x, 
-                                      imu_data.angular_velocity.y,
-                                      imu_data.angular_velocity.z,
-                                      imu_data.linear_acceleration.x, 
-                                      imu_data.linear_acceleration.y, 
-                                      imu_data.linear_acceleration.z,
-                                      mag_data.magnetic_field.x, 
-                                      mag_data.magnetic_field.y, 
-                                      mag_data.magnetic_field.z,
-                                      static_press.fluid_pressure, 
-                                      diff_press.fluid_pressure);
+                // updates_check(i+1, current_pose.pose.position.x,
+                //                    current_pose.pose.position.y,
+                //                    current_pose.pose.position.z,
+                //                    enu_curr.x,
+                //                    enu_curr.y,
+                //                    enu_curr.z,
+                //                    global_position.latitude,
+                //                    global_position.longitude,
+                //                    global_position.altitude,
+                //                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                // updates_check_ss(i+1, imu_data.angular_velocity.x, 
+                //                       imu_data.angular_velocity.y,
+                //                       imu_data.angular_velocity.z,
+                //                       imu_data.linear_acceleration.x, 
+                //                       imu_data.linear_acceleration.y, 
+                //                       imu_data.linear_acceleration.z,
+                //                       mag_data.magnetic_field.x, 
+                //                       mag_data.magnetic_field.y, 
+                //                       mag_data.magnetic_field.z,
+                //                       static_press.fluid_pressure, 
+                //                       diff_press.fluid_pressure);
 
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
                     local_pos_pub.publish(target_pose);
+
+                    gps_lat = double(gps_position.lat)/10000000;
+                    gps_lon = double(gps_position.lon)/10000000;
+                    gps_alt = double(gps_position.alt)/1000;
+                    enu_curr = WGS84ToENU(global_position.latitude,
+                            global_position.longitude,
+                            global_position.altitude,
+                            refpoint.latitude, 
+                            refpoint.longitude, 
+                            refpoint.altitude);
+                    updates_check(i+1, current_pose.pose.position.x,
+                                    current_pose.pose.position.y,
+                                    current_pose.pose.position.z,
+                                    enu_curr.x,
+                                    enu_curr.y,
+                                    enu_curr.z,
+                                    global_position.latitude,
+                                    global_position.longitude,
+                                    global_position.altitude,
+                                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                    updates_check_ss(i+1, imu_data.angular_velocity.x, 
+                                        imu_data.angular_velocity.y,
+                                        imu_data.angular_velocity.z,
+                                        imu_data.linear_acceleration.x, 
+                                        imu_data.linear_acceleration.y, 
+                                        imu_data.linear_acceleration.z,
+                                        mag_data.magnetic_field.x, 
+                                        mag_data.magnetic_field.y, 
+                                        mag_data.magnetic_field.z,
+                                        static_press.fluid_pressure, 
+                                        diff_press.fluid_pressure);
 
                     ros::spinOnce();
     		        rate.sleep();
@@ -415,40 +446,71 @@ int main(int argc, char **argv)
                                 current_pose.pose.position.z);
                 std::printf("[ INFO] Ready to LANDING \n");
             
-                gps_lat = double(gps_position.lat)/10000000;
-                gps_lon = double(gps_position.lon)/10000000;
-                gps_alt = double(gps_position.alt)/1000;
+                // gps_lat = double(gps_position.lat)/10000000;
+                // gps_lon = double(gps_position.lon)/10000000;
+                // gps_alt = double(gps_position.alt)/1000;
                 // enu_curr = WGS84ToENU(global_position.latitude,
                 //           global_position.longitude,
                 //           global_position.altitude,
                 //           refpoint.latitude, 
                 //           refpoint.longitude, 
                 //           refpoint.altitude);
-                updates_check(i+1, current_pose.pose.position.x,
-                                   current_pose.pose.position.y,
-                                   current_pose.pose.position.z,
-                                   enu_curr.x,
-                                   enu_curr.y,
-                                   enu_curr.z,
-                                   global_position.latitude,
-                                   global_position.longitude,
-                                   global_position.altitude,
-                                   gps_lat, gps_lon, gps_alt, rel_alt.data);
-                updates_check_ss(i+1, imu_data.angular_velocity.x, 
-                                      imu_data.angular_velocity.y,
-                                      imu_data.angular_velocity.z,
-                                      imu_data.linear_acceleration.x, 
-                                      imu_data.linear_acceleration.y, 
-                                      imu_data.linear_acceleration.z,
-                                      mag_data.magnetic_field.x, 
-                                      mag_data.magnetic_field.y, 
-                                      mag_data.magnetic_field.z,
-                                      static_press.fluid_pressure, 
-                                      diff_press.fluid_pressure);
+                // updates_check(i+1, current_pose.pose.position.x,
+                //                    current_pose.pose.position.y,
+                //                    current_pose.pose.position.z,
+                //                    enu_curr.x,
+                //                    enu_curr.y,
+                //                    enu_curr.z,
+                //                    global_position.latitude,
+                //                    global_position.longitude,
+                //                    global_position.altitude,
+                //                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                // updates_check_ss(i+1, imu_data.angular_velocity.x, 
+                //                       imu_data.angular_velocity.y,
+                //                       imu_data.angular_velocity.z,
+                //                       imu_data.linear_acceleration.x, 
+                //                       imu_data.linear_acceleration.y, 
+                //                       imu_data.linear_acceleration.z,
+                //                       mag_data.magnetic_field.x, 
+                //                       mag_data.magnetic_field.y, 
+                //                       mag_data.magnetic_field.z,
+                //                       static_press.fluid_pressure, 
+                //                       diff_press.fluid_pressure);
 
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
                     local_pos_pub.publish(target_pose);
+
+                    gps_lat = double(gps_position.lat)/10000000;
+                    gps_lon = double(gps_position.lon)/10000000;
+                    gps_alt = double(gps_position.alt)/1000;
+                    enu_curr = WGS84ToENU(global_position.latitude,
+                            global_position.longitude,
+                            global_position.altitude,
+                            refpoint.latitude, 
+                            refpoint.longitude, 
+                            refpoint.altitude);
+                    updates_check(i+1, current_pose.pose.position.x,
+                                    current_pose.pose.position.y,
+                                    current_pose.pose.position.z,
+                                    enu_curr.x,
+                                    enu_curr.y,
+                                    enu_curr.z,
+                                    global_position.latitude,
+                                    global_position.longitude,
+                                    global_position.altitude,
+                                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                    updates_check_ss(i+1, imu_data.angular_velocity.x, 
+                                        imu_data.angular_velocity.y,
+                                        imu_data.angular_velocity.z,
+                                        imu_data.linear_acceleration.x, 
+                                        imu_data.linear_acceleration.y, 
+                                        imu_data.linear_acceleration.z,
+                                        mag_data.magnetic_field.x, 
+                                        mag_data.magnetic_field.y, 
+                                        mag_data.magnetic_field.z,
+                                        static_press.fluid_pressure, 
+                                        diff_press.fluid_pressure);
 
                     ros::spinOnce();
     		        rate.sleep();
@@ -516,36 +578,15 @@ int main(int argc, char **argv)
                 ros::spinOnce();
                 rate.sleep();
             }
-            std::printf("\nCurrent GPS position: [%f, %f, %.3f]\n", 
+            std::printf("\nCurrent GPS position: [%.8f, %.8f, %.3f]\n", 
                         global_position.latitude, 
                         global_position.longitude, 
                         global_position.altitude);
-            std::printf("Goal GPS position: [%f, %f, %.3f]\n", 
+            std::printf("Goal GPS position: [%.8f, %.8f, %.3f]\n", 
                                 goal_pos[i][0], 
                                 goal_pos[i][1],
                                 goal_pos[i][2]);
-                                  
-            // enu_curr = WGS84ToENU(global_position.latitude,
-            //                       global_position.longitude,
-            //                       global_position.altitude,
-            //                       refpoint.latitude, 
-            //                       refpoint.longitude, 
-            //                       refpoint.altitude);
-            // std::printf("Current local position: [%.3f, %.3f, %.3f]\n", 
-            //                     enu_curr.x, 
-            //                     enu_curr.y, 
-            //                     enu_curr.z);   
-            // std::printf("Target local position: [%.3f, %.3f, %.3f]\n", 
-            //                     enu_goal.x, 
-            //                     enu_goal.y,
-            //                     enu_goal.z);
-            // distance = distanceLocal(enu_goal.x, enu_goal.y, enu_goal.z,
-            //                          enu_curr.x, enu_curr.y, enu_curr.z);
-            // std::printf("Distance to goal: %.3f m \n", distance);
-
-            // bool check = check_position(check_error,
-            //                             enu_goal.x, enu_goal.y, enu_goal.z,
-            //                             enu_curr.x, enu_curr.y, enu_curr.z);
+           
             std::printf("\nCurrent local position: [%.3f, %.3f, %.3f]\n", 
                          current_pose.pose.position.x, 
                          current_pose.pose.position.y, 
@@ -574,22 +615,14 @@ int main(int argc, char **argv)
             if (check && !final_check)
             {
                 t_check = ros::Time::now();
-                std::printf("[ INFO] Reached position: [%f, %f, %.3f]\n", 
+                std::printf("[ INFO] Reached position: [%.8f, %.8f, %.3f]\n", 
                                 global_position.latitude, 
                                 global_position.longitude, 
                                 global_position.altitude);
-                std::printf("[ INFO] Next GPS position: [%f, %f, %.3f]\n", 
+                std::printf("[ INFO] Next GPS position: [%.8f, %.8f, %.3f]\n", 
                                 goal_pos[i+1][0], 
                                 goal_pos[i+1][1],
                                 goal_pos[i+1][2]);
-                // std::printf("[ INFO] Reached local position: [%.3f, %.3f, %.3f]\n", 
-                //                     enu_curr.x, 
-                //                     enu_curr.y, 
-                //                     enu_curr.z);   
-                // std::printf("[ INFO] Target local position: [%.3f, %.3f, %.3f]\n", 
-                //                     enu_goal.x, 
-                //                     enu_goal.y,
-                //                     enu_goal.z);
                 std::printf("[ INFO] Reached position: [%.3f, %.3f, %.3f]\n", 
                                 current_pose.pose.position.x, 
                                 current_pose.pose.position.y, 
@@ -600,34 +633,71 @@ int main(int argc, char **argv)
                                 target_pose.pose.position.z);
                 std::cout << "[ INFO] Hover at checkpoint \n";
 
-                gps_lat = double(gps_position.lat)/10000000;
-                gps_lon = double(gps_position.lon)/10000000;
-                gps_alt = double(gps_position.alt)/1000;
-                updates_check(i+1, current_pose.pose.position.x,
-                                   current_pose.pose.position.y,
-                                   current_pose.pose.position.z,
-                                   enu_curr.x,
-                                   enu_curr.y,
-                                   enu_curr.z,
-                                   global_position.latitude,
-                                   global_position.longitude,
-                                   global_position.altitude,
-                                   gps_lat, gps_lon, gps_alt, rel_alt.data);
-                updates_check_ss(i+1, imu_data.angular_velocity.x, 
-                                      imu_data.angular_velocity.y,
-                                      imu_data.angular_velocity.z,
-                                      imu_data.linear_acceleration.x, 
-                                      imu_data.linear_acceleration.y, 
-                                      imu_data.linear_acceleration.z,
-                                      mag_data.magnetic_field.x, 
-                                      mag_data.magnetic_field.y, 
-                                      mag_data.magnetic_field.z,
-                                      static_press.fluid_pressure, 
-                                      diff_press.fluid_pressure);
+                // gps_lat = double(gps_position.lat)/10000000;
+                // gps_lon = double(gps_position.lon)/10000000;
+                // gps_alt = double(gps_position.alt)/1000;
+                // enu_curr = WGS84ToENU(global_position.latitude,
+                //           global_position.longitude,
+                //           global_position.altitude,
+                //           refpoint.latitude, 
+                //           refpoint.longitude, 
+                //           refpoint.altitude);
+                // updates_check(i+1, current_pose.pose.position.x,
+                //                    current_pose.pose.position.y,
+                //                    current_pose.pose.position.z,
+                //                    enu_curr.x,
+                //                    enu_curr.y,
+                //                    enu_curr.z,
+                //                    global_position.latitude,
+                //                    global_position.longitude,
+                //                    global_position.altitude,
+                //                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                // updates_check_ss(i+1, imu_data.angular_velocity.x, 
+                //                       imu_data.angular_velocity.y,
+                //                       imu_data.angular_velocity.z,
+                //                       imu_data.linear_acceleration.x, 
+                //                       imu_data.linear_acceleration.y, 
+                //                       imu_data.linear_acceleration.z,
+                //                       mag_data.magnetic_field.x, 
+                //                       mag_data.magnetic_field.y, 
+                //                       mag_data.magnetic_field.z,
+                //                       static_press.fluid_pressure, 
+                //                       diff_press.fluid_pressure);
 
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
                     local_pos_pub.publish(target_pose);
+
+                    gps_lat = double(gps_position.lat)/10000000;
+                    gps_lon = double(gps_position.lon)/10000000;
+                    gps_alt = double(gps_position.alt)/1000;
+                    enu_curr = WGS84ToENU(global_position.latitude,
+                            global_position.longitude,
+                            global_position.altitude,
+                            refpoint.latitude, 
+                            refpoint.longitude, 
+                            refpoint.altitude);
+                    updates_check(i+1, current_pose.pose.position.x,
+                                    current_pose.pose.position.y,
+                                    current_pose.pose.position.z,
+                                    enu_curr.x,
+                                    enu_curr.y,
+                                    enu_curr.z,
+                                    global_position.latitude,
+                                    global_position.longitude,
+                                    global_position.altitude,
+                                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                    updates_check_ss(i+1, imu_data.angular_velocity.x, 
+                                        imu_data.angular_velocity.y,
+                                        imu_data.angular_velocity.z,
+                                        imu_data.linear_acceleration.x, 
+                                        imu_data.linear_acceleration.y, 
+                                        imu_data.linear_acceleration.z,
+                                        mag_data.magnetic_field.x, 
+                                        mag_data.magnetic_field.y, 
+                                        mag_data.magnetic_field.z,
+                                        static_press.fluid_pressure, 
+                                        diff_press.fluid_pressure);
 
                     ros::spinOnce();
     		        rate.sleep();
@@ -640,7 +710,7 @@ int main(int argc, char **argv)
             else if (check && final_check)
             {
                 t_check = ros::Time::now();
-                std::printf("[ INFO] Reached FINAL position: [%f, %f, %.3f]\n", 
+                std::printf("[ INFO] Reached FINAL position: [%.8f, %.8f, %.3f]\n", 
                                 global_position.latitude, 
                                 global_position.longitude, 
                                 global_position.altitude);
@@ -654,34 +724,71 @@ int main(int argc, char **argv)
                                 target_pose.pose.position.z);
                 std::printf("[ INFO] Ready to LANDING \n");
 
-                gps_lat = double(gps_position.lat)/10000000;
-                gps_lon = double(gps_position.lon)/10000000;
-                gps_alt = double(gps_position.alt)/1000;
-                updates_check(i+1, current_pose.pose.position.x,
-                                   current_pose.pose.position.y,
-                                   current_pose.pose.position.z,
-                                   enu_curr.x,
-                                   enu_curr.y,
-                                   enu_curr.z,
-                                   global_position.latitude,
-                                   global_position.longitude,
-                                   global_position.altitude,
-                                   gps_lat, gps_lon, gps_alt, rel_alt.data);
-                updates_check_ss(i+1, imu_data.angular_velocity.x, 
-                                      imu_data.angular_velocity.y,
-                                      imu_data.angular_velocity.z,
-                                      imu_data.linear_acceleration.x, 
-                                      imu_data.linear_acceleration.y, 
-                                      imu_data.linear_acceleration.z,
-                                      mag_data.magnetic_field.x, 
-                                      mag_data.magnetic_field.y, 
-                                      mag_data.magnetic_field.z,
-                                      static_press.fluid_pressure, 
-                                      diff_press.fluid_pressure);
+                // gps_lat = double(gps_position.lat)/10000000;
+                // gps_lon = double(gps_position.lon)/10000000;
+                // gps_alt = double(gps_position.alt)/1000;
+                // enu_curr = WGS84ToENU(global_position.latitude,
+                //           global_position.longitude,
+                //           global_position.altitude,
+                //           refpoint.latitude, 
+                //           refpoint.longitude, 
+                //           refpoint.altitude);
+                // updates_check(i+1, current_pose.pose.position.x,
+                //                    current_pose.pose.position.y,
+                //                    current_pose.pose.position.z,
+                //                    enu_curr.x,
+                //                    enu_curr.y,
+                //                    enu_curr.z,
+                //                    global_position.latitude,
+                //                    global_position.longitude,
+                //                    global_position.altitude,
+                //                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                // updates_check_ss(i+1, imu_data.angular_velocity.x, 
+                //                       imu_data.angular_velocity.y,
+                //                       imu_data.angular_velocity.z,
+                //                       imu_data.linear_acceleration.x, 
+                //                       imu_data.linear_acceleration.y, 
+                //                       imu_data.linear_acceleration.z,
+                //                       mag_data.magnetic_field.x, 
+                //                       mag_data.magnetic_field.y, 
+                //                       mag_data.magnetic_field.z,
+                //                       static_press.fluid_pressure, 
+                //                       diff_press.fluid_pressure);
 
                 while ((ros::Time::now() - t_check) < ros::Duration(10))
                 {
                     local_pos_pub.publish(target_pose);
+
+                    gps_lat = double(gps_position.lat)/10000000;
+                    gps_lon = double(gps_position.lon)/10000000;
+                    gps_alt = double(gps_position.alt)/1000;
+                    enu_curr = WGS84ToENU(global_position.latitude,
+                            global_position.longitude,
+                            global_position.altitude,
+                            refpoint.latitude, 
+                            refpoint.longitude, 
+                            refpoint.altitude);
+                    updates_check(i+1, current_pose.pose.position.x,
+                                    current_pose.pose.position.y,
+                                    current_pose.pose.position.z,
+                                    enu_curr.x,
+                                    enu_curr.y,
+                                    enu_curr.z,
+                                    global_position.latitude,
+                                    global_position.longitude,
+                                    global_position.altitude,
+                                    gps_lat, gps_lon, gps_alt, rel_alt.data);
+                    updates_check_ss(i+1, imu_data.angular_velocity.x, 
+                                        imu_data.angular_velocity.y,
+                                        imu_data.angular_velocity.z,
+                                        imu_data.linear_acceleration.x, 
+                                        imu_data.linear_acceleration.y, 
+                                        imu_data.linear_acceleration.z,
+                                        mag_data.magnetic_field.x, 
+                                        mag_data.magnetic_field.y, 
+                                        mag_data.magnetic_field.z,
+                                        static_press.fluid_pressure, 
+                                        diff_press.fluid_pressure);
 
                     ros::spinOnce();
     		        rate.sleep();
