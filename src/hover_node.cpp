@@ -67,7 +67,6 @@ int main(int argc, char **argv)
         rate.sleep();
     }
     std::cout << "[ INFO] Set OFFBOARD stream done \n";
-    ros::Duration(1).sleep();
 
     std::cout << "[ INFO] Waiting arm and takeoff... \n";
     while (ros::ok() && !current_state.armed)
