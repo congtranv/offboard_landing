@@ -311,6 +311,39 @@ int main(int argc, char **argv)
             
                 target_pose.header.stamp = ros::Time::now();
                 local_pos_pub.publish(target_pose);
+
+                gps_lat = double(gps_position.lat)/10000000;
+                gps_lon = double(gps_position.lon)/10000000;
+                gps_alt = double(gps_position.alt)/1000;
+                enu_curr = WGS84ToENU(global_position.latitude,
+                                    global_position.longitude,
+                                    global_position.altitude,
+                                    refpoint.latitude, 
+                                    refpoint.longitude, 
+                                    refpoint.altitude);
+                updates("flight", current_pose.pose.position.x,
+                                current_pose.pose.position.y,
+                                current_pose.pose.position.z,
+                                enu_curr.x,
+                                enu_curr.y,
+                                enu_curr.z,
+                                global_position.latitude,
+                                global_position.longitude,
+                                global_position.altitude,
+                                gps_lat, gps_lon, gps_alt, 
+                                rel_alt.data);
+                updates_sensor("flight", imu_data.angular_velocity.x, 
+                                        imu_data.angular_velocity.y,
+                                        imu_data.angular_velocity.z,
+                                        imu_data.linear_acceleration.x, 
+                                        imu_data.linear_acceleration.y, 
+                                        imu_data.linear_acceleration.z,
+                                        mag_data.magnetic_field.x, 
+                                        mag_data.magnetic_field.y, 
+                                        mag_data.magnetic_field.z,
+                                        static_press.fluid_pressure, 
+                                        diff_press.fluid_pressure);
+
         		ros::spinOnce();
                 rate.sleep();
             }
@@ -323,6 +356,39 @@ int main(int argc, char **argv)
             
                 target_pose.header.stamp = ros::Time::now();
                 local_pos_pub.publish(target_pose);
+
+                gps_lat = double(gps_position.lat)/10000000;
+                gps_lon = double(gps_position.lon)/10000000;
+                gps_alt = double(gps_position.alt)/1000;
+                enu_curr = WGS84ToENU(global_position.latitude,
+                                    global_position.longitude,
+                                    global_position.altitude,
+                                    refpoint.latitude, 
+                                    refpoint.longitude, 
+                                    refpoint.altitude);
+                updates("flight", current_pose.pose.position.x,
+                                current_pose.pose.position.y,
+                                current_pose.pose.position.z,
+                                enu_curr.x,
+                                enu_curr.y,
+                                enu_curr.z,
+                                global_position.latitude,
+                                global_position.longitude,
+                                global_position.altitude,
+                                gps_lat, gps_lon, gps_alt, 
+                                rel_alt.data);
+                updates_sensor("flight", imu_data.angular_velocity.x, 
+                                        imu_data.angular_velocity.y,
+                                        imu_data.angular_velocity.z,
+                                        imu_data.linear_acceleration.x, 
+                                        imu_data.linear_acceleration.y, 
+                                        imu_data.linear_acceleration.z,
+                                        mag_data.magnetic_field.x, 
+                                        mag_data.magnetic_field.y, 
+                                        mag_data.magnetic_field.z,
+                                        static_press.fluid_pressure, 
+                                        diff_press.fluid_pressure);
+
         		ros::spinOnce();
                 rate.sleep();
             }
@@ -556,6 +622,38 @@ int main(int argc, char **argv)
                 target_pose.header.stamp = ros::Time::now();
                 local_pos_pub.publish(target_pose);
 
+                gps_lat = double(gps_position.lat)/10000000;
+                gps_lon = double(gps_position.lon)/10000000;
+                gps_alt = double(gps_position.alt)/1000;
+                enu_curr = WGS84ToENU(global_position.latitude,
+                                    global_position.longitude,
+                                    global_position.altitude,
+                                    refpoint.latitude, 
+                                    refpoint.longitude, 
+                                    refpoint.altitude);
+                updates("flight", current_pose.pose.position.x,
+                                current_pose.pose.position.y,
+                                current_pose.pose.position.z,
+                                enu_curr.x,
+                                enu_curr.y,
+                                enu_curr.z,
+                                global_position.latitude,
+                                global_position.longitude,
+                                global_position.altitude,
+                                gps_lat, gps_lon, gps_alt, 
+                                rel_alt.data);
+                updates_sensor("flight", imu_data.angular_velocity.x, 
+                                        imu_data.angular_velocity.y,
+                                        imu_data.angular_velocity.z,
+                                        imu_data.linear_acceleration.x, 
+                                        imu_data.linear_acceleration.y, 
+                                        imu_data.linear_acceleration.z,
+                                        mag_data.magnetic_field.x, 
+                                        mag_data.magnetic_field.y, 
+                                        mag_data.magnetic_field.z,
+                                        static_press.fluid_pressure, 
+                                        diff_press.fluid_pressure);
+
                 ros::spinOnce();
                 rate.sleep();
             }
@@ -574,6 +672,38 @@ int main(int argc, char **argv)
                 
                 target_pose.header.stamp = ros::Time::now();
                 local_pos_pub.publish(target_pose);
+
+                gps_lat = double(gps_position.lat)/10000000;
+                gps_lon = double(gps_position.lon)/10000000;
+                gps_alt = double(gps_position.alt)/1000;
+                enu_curr = WGS84ToENU(global_position.latitude,
+                                    global_position.longitude,
+                                    global_position.altitude,
+                                    refpoint.latitude, 
+                                    refpoint.longitude, 
+                                    refpoint.altitude);
+                updates("flight", current_pose.pose.position.x,
+                                current_pose.pose.position.y,
+                                current_pose.pose.position.z,
+                                enu_curr.x,
+                                enu_curr.y,
+                                enu_curr.z,
+                                global_position.latitude,
+                                global_position.longitude,
+                                global_position.altitude,
+                                gps_lat, gps_lon, gps_alt, 
+                                rel_alt.data);
+                updates_sensor("flight", imu_data.angular_velocity.x, 
+                                        imu_data.angular_velocity.y,
+                                        imu_data.angular_velocity.z,
+                                        imu_data.linear_acceleration.x, 
+                                        imu_data.linear_acceleration.y, 
+                                        imu_data.linear_acceleration.z,
+                                        mag_data.magnetic_field.x, 
+                                        mag_data.magnetic_field.y, 
+                                        mag_data.magnetic_field.z,
+                                        static_press.fluid_pressure, 
+                                        diff_press.fluid_pressure);
                 
                 ros::spinOnce();
                 rate.sleep();
