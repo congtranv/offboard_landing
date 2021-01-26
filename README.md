@@ -50,7 +50,7 @@
   
 - **on remote controller** switch to ARM, then switch flight mode to OFFBOARD
 
-  on simualation: `rosrun offboard setmode_offb`
+  on simualation: `rosrun offboard_landing setmode_offb`
 
 ### run logging node along
 #### logging node
